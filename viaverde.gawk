@@ -11,7 +11,8 @@ BEGIN {
 
 /<DATA_ENTRADA>/ {
 	
-	dias[$3]++;
+	if ($3 != "null")
+		dias[$3]++;
 }
 
 /<SAIDA>/ {
@@ -44,13 +45,16 @@ BEGIN {
 END {
 	
 	print "alínea a) - calcular o nº de 'entradas' em cada dia do mês.\n";
+	print "Data \t\t Nº de entradas"
+
 	for (i in dias) {
-		print i, dias[i];
+		print i "\t\t" dias[i];
 	}
 
 	print "\nalínea b) - escrever a lista de locais de 'saída'.\n";
+	print "Local \t\t Nº de saídas"
 	for (i in locais) {
-		print i;
+		print i "\t\t" locais[i];
 	}
 
 	print "\nalínea c) - calcula o total gasto no mês.\n";
