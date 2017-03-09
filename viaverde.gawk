@@ -3,6 +3,7 @@
 BEGIN {
 	
 	FS = "[<>]";
+	nDias = 0;
 	nImp = 0;
 	nIvas = 0;
 	nDesc = 0;
@@ -11,8 +12,10 @@ BEGIN {
 
 /<DATA_ENTRADA>/ {
 	
-	if ($3 != "null")
+	if ($3 != "null") {
 		dias[$3]++;
+		porDia[nDias++] = $3;
+	}
 }
 
 /<SAIDA>/ {
@@ -65,12 +68,25 @@ END {
 	}
 	print total;
 	
-	print "\nalínea d)\n";
-	total = 0;
+	print "\nalínea d) - Calcular o total gasto no mês em 'parques' e em 'portagens'.\n";
+	totalP = 0;
+	totalPt = 0;
 	for (i in tipos){
 		if (tipos[i] ~ /Parque/){
-			total += imp[i];
+			totalP += imp[i];
+		}
+		if (tipos[i] ~ /Portagens/){
+			totalPt += imp[i];
 		}
 	}
-	print total;
+	print "Total gasto em parques: " totalP;
+	print "Total gasto em portagens: " totalPt;
+
+	print "\nalínea e) - Total gasto por dia.\n";
+	print "Data \t\t Total gasto\n";
+	for (i in porDia) {
+		totais[porDia[i]] += imp[i];
+	}
+	for (i in totais)
+		print i "\t\t" totais[i];
 }
