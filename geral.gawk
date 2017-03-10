@@ -48,7 +48,7 @@ END {
 	for (i in nEntradas){
 		print i;
 		n = asorti(nEntradas[i], ordenado);
-		for (j=n; j > 0; j--){
+		for (j=1; j < n; j++){
 			data = ordenado[j];
 			print inverter(data), nEntradas[i][data];
 		}
