@@ -32,9 +32,10 @@ NR > 1 {
 
 	# alínea c)
 	imp = getValueOf("IMPORTANCIA");
-	if (imp != null){
+	desc = getValueOf("VALOR_DESCONTO");
+	if (imp != null && desc != null){
 		gsub(",", ".", imp);
-		total += imp;
+		total += imp - desc;
 	}
 
 	# alínea d)
@@ -48,7 +49,7 @@ END {
 	for (i in nEntradas){
 		print i;
 		n = asorti(nEntradas[i], ordenado);
-		for (j=1; j < n; j++){
+		for (j=1; j <= n; j++){
 			data = ordenado[j];
 			print inverter(data), nEntradas[i][data];
 		}
