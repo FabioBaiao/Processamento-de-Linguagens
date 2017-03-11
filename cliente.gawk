@@ -8,10 +8,9 @@ BEGIN {
 
 # HEADER
 NR == 1 {
-
+	extrato = getMesEmissao();
 	printCliente();
-
-	file = getMesEmissao() ".html";
+	printExtrato();
 }
 
 NR > 1 {
@@ -23,19 +22,17 @@ NR > 1 {
 		invData = inverter(data);
 		nEntradas[tipo][invData]++;
 	}
+
+	# alínea b)
+	saida = getValueOf("SAIDA");
+	if (tipo != null && saida != null){
+		saidas[tipo][saida]++;
+	}
 }
 
 END {
-	
-	# alínea a)
-	for (i in nEntradas){
-		print i;
-		n = asorti(nEntradas[i], ordenado);
-		for (j=1; j <= n; j++){
-			data = ordenado[j];
-			print inverter(data), nEntradas[i][data];
-		}
-	}
+	printA();
+	printB();
 }
 
 function inverter (data){
@@ -60,13 +57,13 @@ function getMesEmissao(){
 	}
 }
 
-#args: name_of_file, section active (e.g.: "Perfil"), section inactive
+#args: name_of_file, section active (1 - Consultar, 2 - Perfil)
 function printHeader(file, active){
 	enc = "<meta charset='UTF-8'/>";
 	css = "<link rel='stylesheet' type='text/css' href='styles.css'>";
 	fmt = "<li><a href='%s'> %s </a></li>";
 	menu_active = "<li><a href='%s' class='active'> %s </a></li>";
-	print enc css > file;
+	print "<html><head>" enc css "</head><body>" > file;
 	print "<ul class='topmenu'>" > file;
 	switch (active){
 		case 1:	printf(menu_active, file, "Consultar") > file;
@@ -82,11 +79,94 @@ function printHeader(file, active){
 
 function printFooter(file){
 	footer_fmt = "<div class='footer'> %s </div>";
-	end = "</body> </html>";
+	end = "</body></html>";
 	printf(footer_fmt, "<img src='logo.png'/><h1>Via Verde</h1><h3>Parar para quê?</h3>") > file;
 	print end > file;
 
 }
+
+function printExtrato(){
+	file = extrato ".html";
+	printHeader(file, 1);
+	printSideMenu(file, 0);
+	print "</div>" > file;
+	printFooter(file);
+}
+
+function printSideMenu(file, active){
+	print "<div class='clearfix'><div class='column sidemenu'><ul>" > file;
+    switch (active) {
+    	case 1: printf(menu_active, "Ago-2015-entradas.html", "Número de Entradas") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+    			break;
+    	case 2:	printf(fmt, "Ago-2015-entradas.html", "Número de Entradas") > file;
+  				printf(menu_active, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+    			break;
+    	case 3: printf(fmt, "Ago-2015-entradas.html", "Número de Entradas") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(menu_active, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+    			break;
+    	case 4: printf(fmt, "Ago-2015-entradas.html", "Número de Entradas") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(menu_active, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+    			break;
+    	default:printf(fmt, "Ago-2015-entradas.html", "Número de Entradas") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file; 
+    			break;
+    }
+    print "</ul></div>" > file;
+}
+
+
+function printA(){
+	file = extrato "-entradas.html";
+	printHeader(file, 1);
+	printSideMenu(file, 1);
+	print "<h4 style='color:#008CBA'> Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela ViaVerde </h4>" > file;
+	print "<table style='width:30%'>" > file;
+	for (i in nEntradas){
+		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		n = asorti(nEntradas[i], ordenado);
+		for (j=1; j <= n; j++){
+			data = ordenado[j];
+			print "<tr><td style='text-align:center'>" inverter(data) "</td><td>" nEntradas[i][data] "</td></tr>\n" > file;
+		}
+	}
+	print "</table></div>" > file;
+	printFooter(file);
+}
+
+function printB(){
+	file = extrato "-saidas.html";
+	printHeader(file, 1);
+	printSideMenu(file, 2);
+	print "<h4 style='color:#008CBA'> Locais visitados no mês e respetivo número de visitas </h4>" > file;
+	print "<table style='width:30%'>" > file;
+	for (i in saidas){
+		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		n = asort(saidas[i], ordenado);
+		for (j=n; j > 0; j--){
+			nSaidas = ordenado[j];
+			for (k in saidas[i]){
+				if (saidas[i][k] == nSaidas){
+					print "<tr><td style='text-align:center'>" k "</td><td>" nSaidas "</td></tr>\n" > file;
+					delete saidas[i][k];
+				}
+			}
+		}
+	}
+	print "</table></div>" > file;
+	printFooter(file);
+}
+
 
 function printCliente(){
 	file = "Cliente.html";

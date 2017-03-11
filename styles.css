@@ -8,7 +8,7 @@ table {
 td, th {
 	border: 1px solid #dddddd;
 	text-align: center;
-	padding: 8px;
+	padding: 15px;
 }
 
 tr:nth-child(even) {
@@ -89,6 +89,7 @@ body {
 }
 .sidemenu {
     width: 25%;
+    margin-right: 30px;
 }
 .content {
     width: 75%;
