@@ -28,7 +28,20 @@ NR > 1 {
 	if (tipo != null && saida != null){
 		saidas[tipo][saida]++;
 	}
+
+	# alínea c)
+	imp = getValueOf("IMPORTANCIA");
+	desc = getValueOf("VALOR_DESCONTO");
+	if (imp != null && desc != null){
+		gsub(",", ".", imp);
+		total += imp - desc;
+	}
+
+	# alínea d)
+	if (tipo != null && imp != null)
+		tipos[tipo] += imp;
 }
+
 
 END {
 	printA();
@@ -66,11 +79,11 @@ function printHeader(file, active){
 	print "<html><head>" enc css "</head><body>" > file;
 	print "<ul class='topmenu'>" > file;
 	switch (active){
-		case 1:	printf(menu_active, file, "Consultar") > file;
-				printf(fmt, file, "Perfil") > file;
+		case 1:	printf(menu_active, extrato ".html", "Consultar") > file;
+				printf(fmt, "Cliente.html", "Perfil") > file;
 				break;
-		case 2:	printf(fmt, file, "Consultar") > file;
-				printf(menu_active, file, "Perfil") > file;
+		case 2:	printf(fmt, extrato ".html", "Consultar") > file;
+				printf(menu_active, "Cliente.html", "Perfil") > file;
 				break;
 		default: break;
 	}
@@ -148,7 +161,7 @@ function printB(){
 	file = extrato "-saidas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 2);
-	print "<h4 style='color:#008CBA'> Locais visitados no mês e respetivo número de visitas </h4>" > file;
+	print "<h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela ViaVerde </h4>" > file;
 	print "<table style='width:30%'>" > file;
 	for (i in saidas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
