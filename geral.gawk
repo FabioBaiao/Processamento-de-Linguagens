@@ -94,7 +94,7 @@ function inverter (data){
 
 function getValueOf (tag){
 	
-	for (i=1; i < NF; i++){
+	for (i=2; i < NF; i+=4){
 		if ($i == tag)
 			return $(i+1);
 	}
