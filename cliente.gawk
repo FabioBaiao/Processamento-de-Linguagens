@@ -8,7 +8,56 @@ BEGIN {
 
 # HEADER
 NR == 1 {
+
 	printCliente();
+
+	file = getMesEmissao() ".html";
+}
+
+NR > 1 {
+	
+	# alínea a)
+	tipo = getValueOf("TIPO");
+	data = getValueOf("DATA_ENTRADA");
+	if (tipo != null && data != null && data != "null"){
+		invData = inverter(data);
+		nEntradas[tipo][invData]++;
+	}
+}
+
+END {
+	
+	# alínea a)
+	for (i in nEntradas){
+		print i;
+		n = asorti(nEntradas[i], ordenado);
+		for (j=1; j <= n; j++){
+			data = ordenado[j];
+			print inverter(data), nEntradas[i][data];
+		}
+	}
+}
+
+function inverter (data){
+	split(data, campos, "-");
+	return campos[3] "-" campos[2] "-" campos[1];
+}
+
+function getValueOf (tag){
+	
+	for (i=2; i < NF; i+=4){
+		if ($i == tag)
+			return $(i+1);
+	}
+	return null;
+}
+
+function getMesEmissao(){
+	
+	for (i=1; i < NF; i++){
+		if ($i == "MES_EMISSAO")
+			return $(i+1)
+	}
 }
 
 #args: name_of_file, section active (e.g.: "Perfil"), section inactive
