@@ -11,7 +11,9 @@ BEGIN {
 # HEADER
 NR == 1 {
 	
-	file = getValueOf("MES_EMISSAO") ".html";
+	file = getMesEmissao() ".html";
+	print file;
+	printCliente(file);
 }
 
 NR > 1 {
@@ -99,4 +101,25 @@ function getValueOf (tag){
 			return $(i+1);
 	}
 	return null;
+}
+
+function getMesEmissao(){
+	
+	for (i=1; i < NF; i++){
+		if ($i == "MES_EMISSAO")
+			return $(i+1)
+	}
+}
+
+function printCliente(file){
+	
+	for (i=1; i < NF; i++){
+		if ($i ~ /CLIENTE/){
+			for (i += 2; $i !~ /CLIENTE/; i+=4){
+				gsub("_", " ", $i);
+				print $i, $(i+1);
+			}
+			break;
+		}
+	}
 }
