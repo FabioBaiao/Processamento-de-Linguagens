@@ -4,13 +4,11 @@ BEGIN {
 	
 	FS = "[<>]";
 	RS = "<TRANSACCAO>";
-	#html
-	file = "Cliente.html"
 }
 
 # HEADER
 NR == 1 {
-	printCliente(file);
+	printCliente();
 }
 
 #args: name_of_file, section active (e.g.: "Perfil"), section inactive
@@ -41,7 +39,8 @@ function printFooter(file){
 
 }
 
-function printCliente(file){
+function printCliente(){
+	file = "Cliente.html";
 	printHeader(file, 2);
 	print "<div class='avatar'><img src='profile.png' style='margin-right: 50px'/>" > file;
 	print "<table>" > file;
