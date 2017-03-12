@@ -59,6 +59,12 @@ NR > 1 {
 	if (tipo != null && entrada != null){
 		entradas[tipo][entrada]++;
 	}
+
+	# gasto diário
+	if (tipo != null && data != null && data != "null"){
+		invData = inverter(data);
+		gastoD[invData][tipo] += imp - desc;
+	}
 }
 
 
@@ -66,8 +72,8 @@ END {
 	printA();
 	printB();
 	printCD();
-
 	printEntradas();
+	printGastoD();
 }
 
 function inverter (data){
@@ -139,28 +145,28 @@ function printSideMenu(file, active){
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 2:	printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
-    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
-  				printf(menu_active, "Ago-2015-saidas.html", "Locais de Saída") > file;
+    			printf(menu_active, "Ago-2015-entradas.html", "Locais de Entrada") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 3: printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
     			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
-  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
-  				printf(menu_active, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+  				printf(menu_active, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 4: printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
     			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
-  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
-				printf(menu_active, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+  				printf(menu_active, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 5:	printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
-    			printf(menu_active, "Ago-2015-entradas.html", "Locais de Entrada") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
-				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+				printf(menu_active, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	default:printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
     			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
@@ -191,10 +197,35 @@ function printA(){
 	printFooter(file);
 }
 
+
+function printEntradas(){
+	file = extrato "-entradas.html";
+	printHeader(file, 1);
+	printSideMenu(file, 2);
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
+	print "<table style='width:30%; margin-left:200px'>" > file;
+	for (i in entradas){
+		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		n = asort(entradas[i], ordenado);	
+		for (j=n; j > 0; j--){
+			numeroSaidas = ordenado[j];
+			for (k in entradas[i]){
+				if (entradas[i][k] == numeroSaidas){
+					ref = "https://www.google.pt/maps/place/" k "+Portugal";
+					print "<tr><td>" k "<a href='" ref "'><img class='maps' src='google_maps.png'/></a></td><td>" numeroSaidas "</td></tr>\n" > file;
+					delete entradas[i][k];
+				}
+			}
+		}
+	}
+	print "</table></div></div>" > file;
+	printFooter(file);
+}
+
 function printB(){
 	file = extrato "-saidas.html";
 	printHeader(file, 1);
-	printSideMenu(file, 2);
+	printSideMenu(file, 3);
 	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
 	print "<table style='width:30%; margin-left:200px'>" > file;
 	for (i in saidas){
@@ -215,10 +246,11 @@ function printB(){
 	printFooter(file);
 }
 
+
 function printCD(){
 	file = extrato "-gastoM.html";
 	printHeader(file, 1);
-	printSideMenu(file, 3);
+	printSideMenu(file, 4);
 	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
 	print "<table style='width:30%; margin-left:200px'>" > file;
 	print "<tr><th style='text-align:center'> Serviço </th><th> Montante </th></tr>" > file;
@@ -259,26 +291,22 @@ function printCliente(){
 	printFooter(file);	
 }
 
-function printEntradas(){
-	file = extrato "-entradas.html";
+
+function printGastoD(){
+	file = extrato "-gastoD.html";
 	printHeader(file, 1);
 	printSideMenu(file, 5);
-	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
-	print "<table style='width:30%'>" > file;
-	for (i in entradas){
-		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
-		n = asort(entradas[i], ordenado);	
-		for (j=n; j > 0; j--){
-			numeroSaidas = ordenado[j];
-			for (k in entradas[i]){
-				if (entradas[i][k] == numeroSaidas){
-					ref = "https://www.google.pt/maps/place/" k "+Portugal";
-					print "<tr><td>" k "<a href='" ref "'><img class='maps' src='google_maps.png'/></a></td><td>" numeroSaidas "</td></tr>\n" > file;
-					delete entradas[i][k];
-				}
-			}
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
+	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<tr><th> Dia </th><th> Serviço </th><th> Montante </th></tr>" > file;
+	n = asorti(gastoD, ordenado);
+	for (j=1; j <= n; j++){
+		data = ordenado[j];
+		for (k in gastoD[data]){
+				print "<tr><td>" inverter(data) "</td><td>" k "</td><td>" gastoD[data][k]"€" "</td></tr>\n" > file;
+				delete gastoD[i][k];
 		}
 	}
 	print "</table></div></div>" > file;
-	printFooter(file);
+	printFooter(file); 
 }
