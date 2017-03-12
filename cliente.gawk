@@ -67,7 +67,7 @@ END {
 	printB();
 	printCD();
 
-	printSaidas();
+	printEntradas();
 }
 
 function inverter (data){
@@ -133,26 +133,37 @@ function printSideMenu(file, active){
 	print "<div class='clearfix'><div class='column sidemenu'><ul>" > file;
     switch (active) {
     	case 1: printf(menu_active, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 2:	printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(menu_active, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 3: printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(menu_active, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
     	case 4: printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(menu_active, "Ago-2015-gastoD.html", "Gasto Diário") > file;
     			break;
+    	case 5:	printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(menu_active, "Ago-2015-entradas.html", "Locais de Entrada") > file;
+  				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
+  				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
+				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file;
+    			break;
     	default:printf(fmt, "Ago-2015-numeroEntradas.html", "Número de Entradas") > file;
+    			printf(fmt, "Ago-2015-entradas.html", "Locais de Entrada") > file;
   				printf(fmt, "Ago-2015-saidas.html", "Locais de Saída") > file;
   				printf(fmt, "Ago-2015-gastoM.html", "Gasto Mensal") > file;
 				printf(fmt, "Ago-2015-gastoD.html", "Gasto Diário") > file; 
@@ -251,7 +262,7 @@ function printCliente(){
 function printEntradas(){
 	file = extrato "-entradas.html";
 	printHeader(file, 1);
-	printSideMenu(file, x);
+	printSideMenu(file, 5);
 	print "<h4 style='color:#008CBA'> Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
 	print "<table style='width:30%'>" > file;
 	for (i in entradas){
