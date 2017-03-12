@@ -1,0 +1,243 @@
+%
+% Layout retirado de http://www.di.uminho.pt/~prh/curplc09.html#notas
+%
+\documentclass{report}
+\usepackage[portuges]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage[latin1]{inputenc}
+
+\usepackage{url}
+\usepackage{enumerate}
+
+%\usepackage{alltt}
+%\usepackage{fancyvrb}
+\usepackage{listings}
+%LISTING - GENERAL
+\lstset{
+	basicstyle=\small,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+    frame=tB,
+	mathescape=true,
+	escapeinside={(*@}{@*)}
+}
+%
+%\lstset{ %
+%	language=Java,							% choose the language of the code
+%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
+%	keywordstyle=\bfseries,					% set the keyword style
+%	%numbers=left,							% where to put the line-numbers
+%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
+%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
+%											% will be numbered
+%	numbersep=5pt,							% how far the line-numbers are from the code
+%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
+%	showspaces=false,						% show spaces adding particular underscores
+%	showstringspaces=false,					% underline spaces within strings
+%	showtabs=false,							% show tabs within strings adding particular underscores
+%	frame=none,								% adds a frame around the code
+%	%abovecaptionskip=-.8em,
+%	%belowcaptionskip=.7em,
+%	tabsize=2,								% sets default tabsize to 2 spaces
+%	captionpos=b,							% sets the caption-position to bottom
+%	breaklines=true,						% sets automatic line breaking
+%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
+%	title=\lstname,							% show the filename of files included with \lstinputlisting;
+%											% also try caption instead of title
+%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
+%	morekeywords={*,...}					% if you want to add more keywords to the set
+%}
+
+\usepackage{xspace}
+
+\parindent=0pt
+\parskip=2pt
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+\def\darius{\textsf{Darius}\xspace}
+\def\antlr{\texttt{AnTLR}\xspace}
+\def\pe{\emph{Publicação Eletrónica}\xspace}
+
+\def\titulo#1{\section{#1}}
+\def\super#1{{\em Supervisor: #1}\\ }
+\def\area#1{{\em \'{A}rea: #1}\\[0.2cm]}
+\def\resumo{\underline{Resumo}:\\ }
+
+
+%%%%\input{LPgeneralDefintions}
+
+\title{Processamento de Linguagens (3º Ano MIEI)\\ \textbf{Trabalho Prático 1a - GAWK}\\ Relatório de Desenvolvimento}
+\author{Fábio Luís Baião da Silva\\ (A75662) \and João da Cunha Coelho\\ (A74859) \and Luís Miguel Moreira Fernandes\\ (A74748) }
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+COLOCAR RESUMO DO RELATÓRIO!!!! (Paneleirices do Coelho)
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução} \label{intro}
+
+Introdução do Trabalho a.k.a. Coisas para o Coelho apaneleirar.
+
+%\titulo{Um belo Projeto}
+
+
+%\begin{description}
+%  \item [Enquadramento] \textbf{bla bla} bla bla
+%  \item [Conteúdo do documento] \textsf{ble ble} \texttt{ble} ble
+%  \item [Resultados -- pontos a evidenciar] \textit{bli bli bli bli}
+%  \item [Estrutura do documento] \underline{blo blo blo}
+%\end{description}
+
+
+%Mais exemplos de listas enumeradas mas agora com letras:
+%\begin{enumerate}[a)]
+%\item Listar todas as Pessoas identificadas, sem repetições;
+%\item Listar os Países e Cidades marcadas;
+%\item Listar as Organizações.
+%\end{enumerate}
+
+%A mesma enumeração mas no standard numérico
+%\begin{description}
+%\item[Etape 1:] Listar todas as Pessoas identificadas, sem repetições;
+%\item[Etape 2:] Listar os Países e Cidades marcadas;
+%\item[Etape 3:] Listar as Organizações.
+%\end{description} 
+
+\cleardoublepage
+
+\chapter{Estrutura do Ficheiro XML} \
+De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
+
+
+\textbf{Cabeçalho com informação sobre o mês a que se refere o extrato e os dados do cliente:}
+
+{\footnotesize
+\begin{verbatim}
+<EXTRACTO id="011114056/08/2015">
+<MES_EMISSAO>Ago-2015</MES_EMISSAO>
+<CLIENTE id="514714936">
+  <NIF>987653210</NIF>
+  <NOME>PEDRO MANUEL RANGEL SANTOS HENRIQUES</NOME>
+  <MORADA>RUA XXX</MORADA>
+  <LOCALIDADE>BRAGA</LOCALIDADE>
+  <CODIGO_POSTAL>4715-012 BRAGA</CODIGO_POSTAL>
+</CLIENTE>
+<IDENTIFICADOR id="28876820811">
+<MATRICULA>00-LJ-11</MATRICULA>
+<REF_PAGAMENTO>1234567</REF_PAGAMENTO>
+\end{verbatim}
+}
+
+\textbf{Todas as transações de serviços oferecidos pela ViaVerde (portagens, parques de estacionamento, etc), sendo que cada transação tem campos como: data e hora de entrada e saída, local de entrada e saída, valor, etc:}
+
+{\footnotesize
+\begin{verbatim}
+<TRANSACCAO>
+  <DATA_ENTRADA>26-07-2015</DATA_ENTRADA>
+  <HORA_ENTRADA>11:33</HORA_ENTRADA>
+  <ENTRADA>Povoa N-S</ENTRADA>
+  <DATA_SAIDA>26-07-2015</DATA_SAIDA>
+  <HORA_SAIDA>11:42</HORA_SAIDA>
+  <SAIDA>Angeiras N-S</SAIDA>
+  <IMPORTANCIA>2,00</IMPORTANCIA>
+  <VALOR_DESCONTO>0,00</VALOR_DESCONTO>
+  <TAXA_IVA>23</TAXA_IVA>
+  <OPERADOR>I. de Portugal (N1)</OPERADOR>
+  <TIPO>Portagens</TIPO>
+  <DATA_DEBITO>05-08-2015</DATA_DEBITO>
+  <CARTAO>6749036</CARTAO>
+</TRANSACCAO>
+\end{verbatim}}
+
+\textbf{Rodapé com valores totais:}
+
+{\footnotesize
+\begin{verbatim}
+...
+<TOTAL>77,40</TOTAL>
+</IDENTIFICADOR>
+<TOTAL>77,40</TOTAL>
+<TOTAL_IVA>14,49</TOTAL_IVA>
+</EXTRACTO>
+\end{verbatim}
+}
+
+
+\chapter{Apresentação da Solução de Leitura e Parser} \label{ae}
+\section{Row Separator (RS)}
+
+A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
+Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar.
+
+\section{Field Separator (FS)}
+
+Aqui foi tomada a decisão de escolher como \textit{field separator} os caracteres \textless e \textgreater.
+Cada transação é definida por vários segmentos com o seguinte formato:  \textbf{\textless...\textgreater...\textless/...\textgreater\backslash n}\\
+Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos de cada linha, obtendo-se a seguinte função:
+
+\begin{verbatim}
+\end{verbatim} 
+
+%\subsection{Dados}
+%\subsection{Pedidos}
+%\subsection{Relações}
+
+\chapter{Apresentação das Queries e Resoluções}
+\section{}
+\section{}
+
+
+\chapter{Conclusão} \label{concl}
+CONCLUSÃO DO TRABALHO (mais paneleirices para o João Coelho se entreter).\\
+Trabalho futuro.
+
+%\appendix
+%\chapter{Código do Programa}
+
+%Lista-se a seguir o código \antlr~\cite{Par05} do programa \darius~\cite{NPH2016a} que foi desenvolvido.
+%\begin{verbatim}
+%public class Aula()
+%  {
+%    int n, m;
+%    int max(int a, int b)
+%      {
+%       ......
+%       return(max);
+%      }
+%  }
+%\end{verbatim}
+
+%\begin{verbatim}
+%llll sanjdb c kjnjcnjnjj mmmmmmmmmmmmm hhhhhhhhhhhhhhhhhhhhhhhh jjjjjjjjjjjjjjjjjjjjjjjjjjjj kkkkkkkkkkkkkkkkkk
+%      aqui deve aparecer o código do programa,
+%      tal como está formato no ficheiro-fonte "darius.java"
+%      caso indesejável $\varepsilon$
+%\end{verbatim}
+
+%\begin{lstlisting}[caption={Exemplo de uma Listagem}, label={lstExe1}]
+%llll sanjdb c kjnjcnjnjj mmmmmmmmmmmmm hhhhhhhhhhhhhhhhhhhhhhhh jjjjjjjjjjjjjjjjjjjjjjjjjjjj kkkkkkkkkkkkkkkkkk
+%      ou então aparecer aqui neste sítio um pouco de matematica $\$$
+%      como alternativa ao anterior.
+%      e aqui mais um teste $\varepsilon$
+%\end{lstlisting}
+
+%É ainda possível importar diretamente o ficheiro:
+%\lstinputlisting{plfiltrobase.l} %input de um ficheiro
+
+%\bibliographystyle{alpha}
+%\bibliography{relprojLayout}
+
+
+\end{document} 
