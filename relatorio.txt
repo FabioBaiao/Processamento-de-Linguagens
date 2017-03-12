@@ -1,0 +1,13 @@
+ESTRUTURA DO FICHEIRO viaverde.xml:
+
+	- Cabeçalho com informação sobre o mês a que se refere o extrato e os dados do cliente;
+	- Todas as transações de serviços oferecidos pela ViaVerde (portagens, parques de estacionamento, etc);
+	- Cada transação tem campos como: data e hora de entrada e saída, local de entrada e saída, valor, etc;
+	- No final existe um rodapé com os valores totais.
+
+Decidiu-se separar os records pela tag <TRANSACCAO> com os fields a serem separados pelos caracteres < e >.
+Com o record separator definido desta forma sabe-se que o primeiro record corresponde ao cabeçalho, enquanto que os restantes correspondem às transações.
+Cada transação é definida por vários segmentos consecutivos com o seguinte formato: <...>...</...>\n. Com o field separator que foi definido, os dados relevantes serão sempre os 2º (a tag) e 3º (o valor) campos de cada linha. Assim, para se obter o valor de determinada tag, basta iterar pelos segundos campos de cada linha, obtendo-se a seguinte função:
+...
+
+A estrutura do cabeçalho, ao contrário da estrutura das transações, é heterogénea(?), pelo que se decidiu obter os dados do cliente de forma diferente. 
