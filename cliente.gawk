@@ -252,7 +252,7 @@ function printCD(){
 	printHeader(file, 1);
 	printSideMenu(file, 4);
 	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
-	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<table style='width:50%; margin-left:200px'>" > file;
 	print "<tr><th style='text-align:center'> Serviço </th><th> Montante </th></tr>" > file;
 	n = asort(tipos, ordenado);
 	for (i=n; i > 0; i--){
@@ -297,7 +297,7 @@ function printGastoD(){
 	printHeader(file, 1);
 	printSideMenu(file, 5);
 	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
-	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<table style='width:50%; margin-left:200px'>" > file;
 	print "<tr><th> Dia </th><th> Serviço </th><th> Montante </th></tr>" > file;
 	n = asorti(gastoD, ordenado);
 	for (j=1; j <= n; j++){
