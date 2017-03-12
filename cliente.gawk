@@ -96,7 +96,7 @@ function getMesEmissao(){
 function printHeader(file, active){
 	enc = "<meta charset='UTF-8'/>";
 	css = "<link rel='stylesheet' type='text/css' href='styles.css'>";
-	fmt = "<li><a href='%s'> %s </a></li>";
+	fmt = "<li><a href='%s'> %s </a></li>\n";
 	menu_active = "<li><a href='%s' class='active'> %s </a></li>";
 	print "<html><head>" enc css "</head><body>" > file;
 	print "<ul class='topmenu'>" > file;
@@ -123,8 +123,8 @@ function printFooter(file){
 function printExtrato(){
 	file = extrato ".html";
 	printHeader(file, 1);
-	print "<p></p>" > file;
 	printSideMenu(file, 0);
+	print "<div class='column content'><div class='header'><h1></h1></div></div>" > file;
 	print "</div>" > file;
 	printFooter(file);
 }
@@ -177,8 +177,8 @@ function printA(){
 	file = extrato "-numeroEntradas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 1);
-	print "<h4 style='color:#008CBA'> Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
-	print "<table style='width:30%'>" > file;
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
+	print "<table style='width:30%; margin-left:200px'>" > file;
 	for (i in nEntradas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
 		n = asorti(nEntradas[i], ordenado);
@@ -187,7 +187,7 @@ function printA(){
 			print "<tr><td style='text-align:center'>" inverter(data) "</td><td>" nEntradas[i][data] "</td></tr>\n" > file;
 		}
 	}
-	print "</table></div>" > file;
+	print "</table></div></div>" > file;
 	printFooter(file);
 }
 
@@ -195,8 +195,8 @@ function printB(){
 	file = extrato "-saidas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 2);
-	print "<h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
-	print "<table style='width:30%'>" > file;
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
+	print "<table style='width:30%; margin-left:200px'>" > file;
 	for (i in saidas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
 		n = asort(saidas[i], ordenado);	
@@ -211,7 +211,7 @@ function printB(){
 			}
 		}
 	}
-	print "</table></div>" > file;
+	print "</table></div></div>" > file;
 	printFooter(file);
 }
 
@@ -219,8 +219,8 @@ function printCD(){
 	file = extrato "-gastoM.html";
 	printHeader(file, 1);
 	printSideMenu(file, 3);
-	print "<h4 style='color:#008CBA'> Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
-	print "<table style='width:30%'>" > file;
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
+	print "<table style='width:30%; margin-left:200px'>" > file;
 	print "<tr><th style='text-align:center'> Serviço </th><th> Montante </th></tr>" > file;
 	n = asort(tipos, ordenado);
 	for (i=n; i > 0; i--){
@@ -236,7 +236,7 @@ function printCD(){
 	printf (values, "Total sem IVA", semIvaTotal) > file;
 	printf (values, "IVA", ivaTotal) > file;
 	printf (values, "TOTAL", total) > file;
-	print "</table></div>" > file;
+	print "</table></div></div>" > file;
 	printFooter(file); 
 }
 
@@ -263,7 +263,7 @@ function printEntradas(){
 	file = extrato "-entradas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 5);
-	print "<h4 style='color:#008CBA'> Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
+	print "<div class='column content'><div class='header'><h4 style='color:#008CBA'> Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4></div>" > file;
 	print "<table style='width:30%'>" > file;
 	for (i in entradas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
@@ -279,6 +279,6 @@ function printEntradas(){
 			}
 		}
 	}
-	print "</table></div>" > file;
+	print "</table></div></div>" > file;
 	printFooter(file);
 }
