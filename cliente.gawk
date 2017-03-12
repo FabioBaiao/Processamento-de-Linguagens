@@ -46,6 +46,7 @@ NR > 1 {
 END {
 	printA();
 	printB();
+	printCD();
 }
 
 function inverter (data){
@@ -101,6 +102,7 @@ function printFooter(file){
 function printExtrato(){
 	file = extrato ".html";
 	printHeader(file, 1);
+	print "<p></p>" > file;
 	printSideMenu(file, 0);
 	print "</div>" > file;
 	printFooter(file);
@@ -143,7 +145,7 @@ function printA(){
 	file = extrato "-entradas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 1);
-	print "<h4 style='color:#008CBA'> Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela ViaVerde </h4>" > file;
+	print "<h4 style='color:#008CBA'> Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
 	print "<table style='width:30%'>" > file;
 	for (i in nEntradas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
@@ -161,16 +163,17 @@ function printB(){
 	file = extrato "-saidas.html";
 	printHeader(file, 1);
 	printSideMenu(file, 2);
-	print "<h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela ViaVerde </h4>" > file;
+	print "<h4 style='color:#008CBA'> Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
 	print "<table style='width:30%'>" > file;
 	for (i in saidas){
 		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
-		n = asort(saidas[i], ordenado);
+		n = asort(saidas[i], ordenado);	
 		for (j=n; j > 0; j--){
 			nSaidas = ordenado[j];
 			for (k in saidas[i]){
 				if (saidas[i][k] == nSaidas){
-					print "<tr><td style='text-align:center'>" k "</td><td>" nSaidas "</td></tr>\n" > file;
+					ref = "https://www.google.pt/maps/place/" k "+Portugal";
+					print "<tr><td>" k "<a href='" ref "'><img class='maps' src='google_maps.png'/></a></td><td>" nSaidas "</td></tr>\n" > file;
 					delete saidas[i][k];
 				}
 			}
@@ -178,6 +181,28 @@ function printB(){
 	}
 	print "</table></div>" > file;
 	printFooter(file);
+}
+
+function printCD(){
+	file = extrato "-gastoM.html";
+	printHeader(file, 1);
+	printSideMenu(file, 3);
+	print "<h4 style='color:#008CBA'> Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde </h4>" > file;
+	print "<table style='width:30%'>" > file;
+	print "<tr><th style='text-align:center'> Serviço </th><th> Montante </th></tr>" > file;
+	n = asort(tipos, ordenado);
+	for (i=n; i > 0; i--){
+		valor = ordenado[i];
+		for (j in tipos){
+			if (tipos[j] == valor){
+				print "<tr><td style='text-align:center'>" j "</td><td>" valor"€" "</td></tr>\n" > file;
+				delete tipos[j];
+			}
+		}
+	}
+	print "<tr><th style='text-align:center'> TOTAL </th><td>" total"€" "</td></tr>\n" > file;
+	print "</table></div>" > file;
+	printFooter(file); 
 }
 
 
