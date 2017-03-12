@@ -4,6 +4,10 @@ BEGIN {
 	
 	FS = "[<>]";
 	RS = "<TRANSACCAO>";
+
+	total = 0;
+	semIvaTotal = 0;
+	ivaTotal = 0;
 }
 
 # HEADER
@@ -40,6 +44,15 @@ NR > 1 {
 	# alínea d)
 	if (tipo != null && imp != null)
 		tipos[tipo] += imp;
+
+	# calcular iva e valor sem iva
+	ivaPerc = getValueOf("TAXA_IVA");
+	if (ivaPerc != null){
+		semIva = imp / (1 + ivaPerc/100);
+
+		semIvaTotal += semIva;
+		ivaTotal += semIva * (ivaPerc/100);
+	}
 }
 
 
@@ -200,7 +213,10 @@ function printCD(){
 			}
 		}
 	}
-	print "<tr><th style='text-align:center'> TOTAL </th><td>" total"€" "</td></tr>\n" > file;
+	values = "<tr><th style='text-align:center'> %s </th><td> %.2f€ </td></tr>\n";
+	printf (values, "Total sem IVA", semIvaTotal) > file;
+	printf (values, "IVA", ivaTotal) > file;
+	printf (values, "TOTAL", total) > file;
 	print "</table></div>" > file;
 	printFooter(file); 
 }
