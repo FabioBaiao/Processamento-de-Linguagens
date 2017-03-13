@@ -81,7 +81,8 @@
 \maketitle
 
 \begin{abstract}
-COLOCAR RESUMO DO RELATÓRIO!!!! (Paneleirices do Coelho)
+Este projeto visa provar que as \textit{Expressões Regulares} podem ser muito úteis, mostrando que é possível utilizá-las na rotina do dia-a-dia.\\
+A Via Verde é uma coleção de sistemas eletrónicos de portagens usado em Portugal desde 1991. O suporte para este projeto é um extrato mensal de um dos seus utilizadores, que irá ser usado para responder a umas \textit{queries} usando \textbf{GAWK}, um dos processadores de texto mais proeminentes no GNU/Linux.
 \end{abstract}
 
 \tableofcontents
@@ -176,6 +177,12 @@ De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
 
 
 \chapter{Apresentação da Solução de Leitura e Parser} \label{ae}
+
+\begin{verbatim}
+RS = "<TRANSACCAO>";
+FS = "[<>]";
+\end{verbatim}
+
 \section{Row Separator (RS)}
 
 A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
@@ -184,10 +191,16 @@ Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \tex
 \section{Field Separator (FS)}
 
 Aqui foi tomada a decisão de escolher como \textit{field separator} os caracteres \textless e \textgreater.
-Cada transação é definida por vários segmentos com o seguinte formato:  \textbf{\textless...\textgreater...\textless/...\textgreater\backslash n}\\
+Cada transação é definida por vários segmentos com o seguinte formato:
+\begin{verbatim}
+<...>...</...>\n
+\end{verbatim}
 Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos de cada linha, obtendo-se a seguinte função:
 
 \begin{verbatim}
+int main() {
+  return 0;
+}
 \end{verbatim} 
 
 %\subsection{Dados}
@@ -195,8 +208,56 @@ Com o \textit{field separator} que foi anunciado anteriormente, os dados relevan
 %\subsection{Relações}
 
 \chapter{Apresentação das Queries e Resoluções}
-\section{}
-\section{}
+
+\begin{enumerate}[a)]
+\item Calcular o número de 'entradas' em cada dia do mês
+
+\begin{verbatim}
+print "Data \t\t Nº de entradas"
+
+  for (i in dias) {
+    print i "\t\t" dias[i];
+  }
+\end{verbatim}
+
+\item Escrever a lista de locais de saída
+
+\begin{verbatim}
+print "Local \t\t Nº de saídas"
+  for (i in locais) {
+    print i "\t\t" locais[i];
+  }
+\end{verbatim}
+
+\item Calcular o total gasto no mês
+
+\begin{verbatim}
+total = 0;
+  iva = 0;
+  for (i in imp) {
+    total += imp[i] * (ivas[i]/100 + 1) - desc[i];
+  }
+  print total;
+\end{verbatim}
+
+\item Calcular o total gasto no mês apenas em parques
+
+\begin{verbatim}
+totalP = 0;
+  totalPt = 0;
+  for (i in tipos){
+    if (tipos[i] ~ /Parque/){
+      totalP += imp[i];
+    }
+    if (tipos[i] ~ /Portagens/){
+      totalPt += imp[i];
+    }
+  }
+  print "Total gasto em parques: " totalP;
+  print "Total gasto em portagens: " totalPt;
+\end{verbatim}
+
+\end{enumerate}
 
 
 \chapter{Conclusão} \label{concl}
