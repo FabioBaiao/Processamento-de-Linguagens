@@ -84,6 +84,8 @@
 \textit{Regular expressions} can be very useful. This project intends to prove exactly this point, showing how to use them in a subject that makes part of our daily routine.
 
 Via Verde is an electronical toll collection system used in Portugal since 1991. The stock for this project is a monthly extract from one of its users, which will be used to answer some queries using \textbf{GAWK}, one of the most prominent text-processing utility on GNU/Linux.
+
+%NÂO GOSTO DISTO EM INGLÊS!!
 \end{abstract}
 
 \tableofcontents
@@ -93,6 +95,10 @@ Via Verde is an electronical toll collection system used in Portugal since 1991.
 O primeiro contacto com as expressões regulares despertou grande curiosidade, dada a capacidade de analisar e interpretar um ficheiro de texto, que pode ser longo, em pouco tempo, recolhendo de uma só vez informação suficiente para responder a várias interrogações. Este trabalho permitirá comprovar essa utilidade e eficiência do \textbf{GAWK}, aplicando-o a um exemplo prático do dia-a-dia.
 
 A escolha recaiu no tema da Via Verde devido à clareza do enunciado e à utilidade do tema, uma vez que este tipo de processador de transações pode ser aplicado nas mais diversas áreas.
+
+%Aqui há um problema. Eu sei que no enunciado fala muito em expressões regulares, só que nós não temos quase nenhuma...
+%Por isso não sei se é boa ideia falarmos muito neste aspeto.
+
 
 %\titulo{Um belo Projeto}
 
@@ -186,7 +192,7 @@ RS = "<TRANSACCAO>";
 FS = "[<>]";
 \end{verbatim}
 
-\section{Row Separator (RS)}
+\section{Record Separator (RS)}
 
 A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
 
@@ -199,7 +205,7 @@ Cada transação é definida por vários segmentos com o seguinte formato:
 \begin{verbatim}
 <...>...</...>\n
 \end{verbatim}
-Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos de cada linha, obtendo-se a seguinte função:
+Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos referentes à tag em cada linha, obtendo-se a seguinte função:
 
 \begin{verbatim}
 function getValueOf (tag){
