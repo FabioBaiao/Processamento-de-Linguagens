@@ -81,15 +81,18 @@
 \maketitle
 
 \begin{abstract}
-Este projeto visa provar que as \textit{Expressões Regulares} podem ser muito úteis, mostrando que é possível utilizá-las na rotina do dia-a-dia.\\
-A Via Verde é uma coleção de sistemas eletrónicos de portagens usado em Portugal desde 1991. O suporte para este projeto é um extrato mensal de um dos seus utilizadores, que irá ser usado para responder a umas \textit{queries} usando \textbf{GAWK}, um dos processadores de texto mais proeminentes no GNU/Linux.
+\textit{Regular expressions} can be very useful. This project intends to prove exactly this point, showing how to use them in a subject that makes part of our daily routine.
+
+Via Verde is an electronical toll collection system used in Portugal since 1991. The stock for this project is a monthly extract from one of its users, which will be used to answer some queries using \textbf{GAWK}, one of the most prominent text-processing utility on GNU/Linux.
 \end{abstract}
 
 \tableofcontents
 
 \chapter{Introdução} \label{intro}
 
-Introdução do Trabalho a.k.a. Coisas para o Coelho apaneleirar.
+O primeiro contacto com as expressões regulares despertou grande curiosidade, dada a capacidade de analisar e interpretar um ficheiro de texto, que pode ser longo, em pouco tempo, recolhendo de uma só vez informação suficiente para responder a várias interrogações. Este trabalho permitirá comprovar essa utilidade e eficiência do \textbf{GAWK}, aplicando-o a um exemplo prático do dia-a-dia.
+
+A escolha recaiu no tema da Via Verde devido à clareza do enunciado e à utilidade do tema, uma vez que este tipo de processador de transações pode ser aplicado nas mais diversas áreas.
 
 %\titulo{Um belo Projeto}
 
@@ -186,6 +189,7 @@ FS = "[<>]";
 \section{Row Separator (RS)}
 
 A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
+
 Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar.
 
 \section{Field Separator (FS)}
@@ -198,8 +202,13 @@ Cada transação é definida por vários segmentos com o seguinte formato:
 Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos de cada linha, obtendo-se a seguinte função:
 
 \begin{verbatim}
-int main() {
-  return 0;
+function getValueOf (tag){
+  
+  for (i=2; i < NF; i+=4){
+    if ($i == tag)
+      return $(i+1);
+  }
+  return null;
 }
 \end{verbatim} 
 
@@ -209,96 +218,127 @@ int main() {
 
 \chapter{Apresentação das Queries e Resoluções}
 
+\section{Queries de Resolução Obrigatória}
+
+\bigskip
+
+A escolha do \textbf{RS} permite-nos encontrar, para cada transação, o valor do campo que pretendemos, invocando somente a função \textit{getValueOf}, sendo o argumento esse mesmo campo. 
+
+\bigskip
+
 \begin{enumerate}[a)]
 \item Calcular o número de 'entradas' em cada dia do mês
 
-\begin{verbatim}
-print "Data \t\t Nº de entradas"
+Para além do número de entradas, extendemos o âmbito da \textit{query} de modo a distinguir as entradas nos diferentes serviços - portagens ou parques de estacionamento.
 
-  for (i in dias) {
-    print i "\t\t" dias[i];
+\begin{verbatim}
+tipo = getValueOf("TIPO");
+data = getValueOf("DATA_ENTRADA");
+  if (tipo != null && data != null && data != "null"){
+    invData = inverter(data);
+    nEntradas[tipo][invData]++;
+  }
+}
+\end{verbatim}
+
+Para a impressão dos resultados foi criada uma tabela \textit{html}, porém aqui mostrar-se-á o processo de impressão no terminal para que seja mais fácil explicar o processo.
+Começou-se por separar os resultados por tipo. Em seguida, como se pretendia a impressão ordenada das datas, utilizou-se a função \textit{asorti} para criar um array com as datas ordenadas de forma crescente, iterando-o depois no momento de imprimir o valor do número de entradas.  
+
+\begin{verbatim}
+
+for (i in nEntradas){
+    print i;
+    n = asorti(nEntradas[i], ordenado);
+    for (j=1; j <= n; j++){
+      data = ordenado[j];
+      print inverter(data), nEntradas[i][data];
+    }
   }
 \end{verbatim}
 
+\bigskip
+
 \item Escrever a lista de locais de saída
 
+Como \textit{query} adicional, foi acrescentado a cada local o número de vezes que este foi utilizado como local de saída, bem como o tipo de serviço: \textbf{saídas[tipo][saída]} representa o número de vezes que a saída \textit{saída} foi usada para o serviço \textit{tipo} (Portagem ou Parque de Estacionamento).
+
 \begin{verbatim}
-print "Local \t\t Nº de saídas"
-  for (i in locais) {
-    print i "\t\t" locais[i];
+saida = getValueOf("SAIDA");
+  if (tipo != null && saida != null){
+    saidas[tipo][saida]++;
+  }
+
+for (i in saidas){
+    n = asort(saidas[i], ordenado); 
+    for (j=n; j > 0; j--){
+      numeroSaidas = ordenado[j];
+      for (k in saidas[i]){
+        if (saidas[i][k] == numeroSaidas){
+          print k, numeroSaidas;
+          delete saidas[i][k];
+        }
+      }
+    }
   }
 \end{verbatim}
 
 \item Calcular o total gasto no mês
 
 \begin{verbatim}
-total = 0;
-  iva = 0;
-  for (i in imp) {
-    total += imp[i] * (ivas[i]/100 + 1) - desc[i];
+imp = getValueOf("IMPORTANCIA");
+  desc = getValueOf("VALOR_DESCONTO");
+  if (imp != null && desc != null){
+    gsub(",", ".", imp);
+    total += imp - desc;
   }
-  print total;
+
+print values, "TOTAL", total;
 \end{verbatim}
 
 \item Calcular o total gasto no mês apenas em parques
 
 \begin{verbatim}
-totalP = 0;
-  totalPt = 0;
-  for (i in tipos){
-    if (tipos[i] ~ /Parque/){
-      totalP += imp[i];
-    }
-    if (tipos[i] ~ /Portagens/){
-      totalPt += imp[i];
+if (tipo != null && imp != null) {
+  tipos[tipo] += imp;
+}
+
+n = asort(tipos, ordenado);
+for (i=n; i > 0; i--){
+  valor = ordenado[i];
+  for (j in tipos){
+    if (tipos[j] == valor){
+      print j, valor;
+      delete tipos[j];
     }
   }
-  print "Total gasto em parques: " totalP;
-  print "Total gasto em portagens: " totalPt;
+}
 \end{verbatim}
 
 \end{enumerate}
 
+\section{Queries Adicionais}
+
+\begin{enumerate}[a)]
+
+\item Cenas fixes
+
+\begin{verbatim}
+Coisas lindas de cenas fixes
+\end{verbatim}
+
+\item Mais cenas fixes
+
+\begin{verbatim}
+Cenas fixes dentro de mais cenas fixes
+\end{verbatim}
+
+\end{enumerate}
 
 \chapter{Conclusão} \label{concl}
-CONCLUSÃO DO TRABALHO (mais paneleirices para o João Coelho se entreter).\\
-Trabalho futuro.
+Concluído o projeto, destaca-se a facilidade que o filtro de texto permite na recolha de informações do ficheiro. Após a escolha dos \textbf{RS} e \textbf{FS} apropriados, tornou-se simples responder às \textit{queries} que nos iam surgindo ao longo do desenvolvimento do projeto.
 
-%\appendix
-%\chapter{Código do Programa}
+Por outro lado, sublinha-se a criação de uma página \textit{HTML} para a apresentação dos dados, pois tratou-se da nossa primeira experiência com \textit{HTML} e com resultados, a nosso ver, bastante apelativos.
 
-%Lista-se a seguir o código \antlr~\cite{Par05} do programa \darius~\cite{NPH2016a} que foi desenvolvido.
-%\begin{verbatim}
-%public class Aula()
-%  {
-%    int n, m;
-%    int max(int a, int b)
-%      {
-%       ......
-%       return(max);
-%      }
-%  }
-%\end{verbatim}
-
-%\begin{verbatim}
-%llll sanjdb c kjnjcnjnjj mmmmmmmmmmmmm hhhhhhhhhhhhhhhhhhhhhhhh jjjjjjjjjjjjjjjjjjjjjjjjjjjj kkkkkkkkkkkkkkkkkk
-%      aqui deve aparecer o código do programa,
-%      tal como está formato no ficheiro-fonte "darius.java"
-%      caso indesejável $\varepsilon$
-%\end{verbatim}
-
-%\begin{lstlisting}[caption={Exemplo de uma Listagem}, label={lstExe1}]
-%llll sanjdb c kjnjcnjnjj mmmmmmmmmmmmm hhhhhhhhhhhhhhhhhhhhhhhh jjjjjjjjjjjjjjjjjjjjjjjjjjjj kkkkkkkkkkkkkkkkkk
-%      ou então aparecer aqui neste sítio um pouco de matematica $\$$
-%      como alternativa ao anterior.
-%      e aqui mais um teste $\varepsilon$
-%\end{lstlisting}
-
-%É ainda possível importar diretamente o ficheiro:
-%\lstinputlisting{plfiltrobase.l} %input de um ficheiro
-
-%\bibliographystyle{alpha}
-%\bibliography{relprojLayout}
-
+Quanto a trabalho futuro, a interpretação de um ficheiro com extratos de vários meses seria o passo seguinte lógico deste tipo de projeto.
 
 \end{document} 
