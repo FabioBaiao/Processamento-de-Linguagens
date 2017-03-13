@@ -212,10 +212,6 @@ function getValueOf (tag){
 }
 \end{verbatim} 
 
-%\subsection{Dados}
-%\subsection{Pedidos}
-%\subsection{Relações}
-
 \chapter{Apresentação das Queries e Resoluções}
 
 \section{Queries de Resolução Obrigatória}
@@ -320,16 +316,38 @@ for (i=n; i > 0; i--){
 
 \begin{enumerate}[a)]
 
-\item Cenas fixes
+\item Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde
 
 \begin{verbatim}
-Coisas lindas de cenas fixes
+if (tipo != null && data != null && data != "null"){
+  invData = inverter(data);
+  gastoD[invData][tipo] += imp - desc;
+}
+
+n = asorti(gastoD, ordenado);
+for (j=1; j <= n; j++){
+  data = ordenado[j];
+  for (k in gastoD[data]){
+    print inverter(data), k, gastoD[data][k];
+    delete gastoD[i][k];
+  }
+}
 \end{verbatim}
 
-\item Mais cenas fixes
+\item Débitos realizados por dia nos serviços Via Verde
 
 \begin{verbatim}
-Cenas fixes dentro de mais cenas fixes
+dataDebito = getValueOf("DATA_DEBITO");
+if (dataDebito != null && imp != null){
+  invData = inverter(dataDebito);
+  debitos[invData] += imp;
+}
+
+n = asorti(debitos, ordenado);
+  for (i=1; i <= n; i++){
+    dataDebito = ordenado[i];
+    print inverter(dataDebito), debitos[dataDebito];
+  }
 \end{verbatim}
 
 \end{enumerate}
