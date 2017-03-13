@@ -1,5 +1,0 @@
-1ª - Mostrar ordenadamente os intervalos de horários em que mais é comum andar em autoestradas.
-2ª - igual à de cima, mas para os parques.
-3ª - Quantas vezes os locais de saída foram repetidos.
-4ª - Total gasto por dia.
-5ª - Calcular o total gasto em portagens.
