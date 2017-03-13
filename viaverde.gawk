@@ -11,7 +11,8 @@ BEGIN {
 
 	fmt = "<li><a href='%s'> %s </a></li>\n";
 	menu_active = "<li><a href='%s' class='active'> %s </a></li>";
-	title = "<div class='column content'><div class='header'><h4 style='color:#008CBA'> %s </h4></div>";
+	title = "<div class='column content'><div class='header'><h4 style='color:#008CBA;'> %s </h4></div>";
+	maps = "<a target='_blank' href='https://www.google.pt/maps/place/%s+Portugal'><img class='maps' src='../lib/google_maps.png'/></a>";
 }
 
 # HEADER
@@ -156,8 +157,7 @@ function printExtrato(){
 	file = extrato ".html";
 	printHeader(file, 1);
 	printSideMenu(file, 0);
-	print "<div class='column content'><div class='header'><h1></h1></div></div>" > file;
-	print "</div>" > file;
+	print "<div class='column content'><div class='header'><h1></h1></div></div></div>" > file;
 	printFooter(file, 1);
 }
 
@@ -224,13 +224,13 @@ function printA(){
 	printHeader(file, 3);
 	printSideMenu(file, 1);
 	printf(title, "Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<table class='center' style='width:30%'>" > file;
 	for (i in nEntradas){
-		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		print "<tr><th>" i "</th></tr>" > file;
 		n = asorti(nEntradas[i], ordenado);
 		for (j=1; j <= n; j++){
 			data = ordenado[j];
-			print "<tr><td style='text-align:center'>" inverter(data) "</td><td>" nEntradas[i][data] "</td></tr>\n" > file;
+			print "<tr><td>" inverter(data) "</td><td>" nEntradas[i][data] "</td></tr>\n" > file;
 		}
 	}
 	print "</table></div></div>" > file;
@@ -243,16 +243,17 @@ function printEntradas(){
 	printHeader(file, 3);
 	printSideMenu(file, 2);
 	printf (title, "Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<table class='center' style='width:30%'>" > file;
 	for (i in entradas){
-		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		print "<tr><th>" i "</th></tr>" > file;
 		n = asort(entradas[i], ordenado);	
 		for (j=n; j > 0; j--){
 			numeroEntradas = ordenado[j];
 			for (k in entradas[i]){
 				if (entradas[i][k] == numeroEntradas){
-					ref = "https://www.google.pt/maps/place/" k "+Portugal";
-					print "<tr><td>" k "<a target='_blank' href='" ref "'><img class='maps' src='../lib/google_maps.png'/></a></td><td>" numeroEntradas "</td></tr>\n" > file;
+					print "<tr><td>" k > file;
+					printf(maps, k) > file;
+					print "</td><td>" numeroEntradas "</td></tr>\n" > file;
 					delete entradas[i][k];
 				}
 			}
@@ -267,16 +268,17 @@ function printB(){
 	printHeader(file, 3);
 	printSideMenu(file, 3);
 	printf (title, "Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table style='width:30%; margin-left:200px'>" > file;
+	print "<table class='center' style='width:30%'>" > file;
 	for (i in saidas){
-		print "<tr><th style='text-align:center'>" i "</th></tr>" > file;
+		print "<tr><th>" i "</th></tr>" > file;
 		n = asort(saidas[i], ordenado);	
 		for (j=n; j > 0; j--){
 			numeroSaidas = ordenado[j];
 			for (k in saidas[i]){
 				if (saidas[i][k] == numeroSaidas){
-					ref = "https://www.google.pt/maps/place/" k "+Portugal";
-					print "<tr><td>" k "<a target='_blank' href='" ref "'><img class='maps' src='../lib/google_maps.png'/></a></td><td>" numeroSaidas "</td></tr>\n" > file;
+					print "<tr><td>" k > file;
+					printf(maps, k) > file;
+					print "</td><td>" numeroSaidas "</td></tr>\n" > file;
 					delete saidas[i][k];
 				}
 			}
@@ -292,19 +294,19 @@ function printCD(){
 	printHeader(file, 3);
 	printSideMenu(file, 4);
 	printf (title, "Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table style='width:50%; margin-left:200px'>" > file;
-	print "<tr><th style='text-align:center'> Serviço </th><th> Montante </th></tr>" > file;
+	print "<table class='center' style='width:50%'>" > file;
+	print "<tr><th> Serviço </th><th> Montante </th></tr>" > file;
 	n = asort(tipos, ordenado);
 	for (i=n; i > 0; i--){
 		valor = ordenado[i];
 		for (j in tipos){
 			if (tipos[j] == valor){
-				print "<tr><td style='text-align:center'>" j "</td><td>" valor"€" "</td></tr>\n" > file;
+				print "<tr><td>" j "</td><td>" valor "€</td></tr>\n" > file;
 				delete tipos[j];
 			}
 		}
 	}
-	values = "<tr><th style='text-align:center'> %s </th><td> %.2f€ </td></tr>\n";
+	values = "<tr><th> %s </th><td> %.2f€ </td></tr>\n";
 	printf (values, "Total sem IVA", semIvaTotal) > file;
 	printf (values, "IVA", ivaTotal) > file;
 	printf (values, "TOTAL", total) > file;
@@ -337,13 +339,13 @@ function printGastoD(){
 	printHeader(file, 3);
 	printSideMenu(file, 5);
 	printf (title, "Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table style='width:50%; margin-left:200px'>" > file;
+	print "<table class='center' style='width:50%'>" > file;
 	print "<tr><th> Dia </th><th> Serviço </th><th> Montante </th></tr>" > file;
 	n = asorti(gastoD, ordenado);
 	for (j=1; j <= n; j++){
 		data = ordenado[j];
 		for (k in gastoD[data]){
-				print "<tr><td>" inverter(data) "</td><td>" k "</td><td>" gastoD[data][k]"€" "</td></tr>\n" > file;
+				print "<tr><td>" inverter(data) "</td><td>" k "</td><td>" gastoD[data][k] "€</td></tr>\n" > file;
 				delete gastoD[i][k];
 		}
 	}
@@ -356,12 +358,12 @@ function printDebitos(){
 	printHeader(file, 3);
 	printSideMenu(file, 6);
 	printf (title, "Débitos realizados por dia nos serviços da Via Verde") > file;
-	print "<table style='width:50%; margin-left:200px'>" > file;
+	print "<table class='center' style='width:50%'>" > file;
 	print "<tr><th> Dia </th><th> Montante </th></tr>" > file;
 	n = asorti(debitos, ordenado);
 	for (i=1; i <= n; i++){
 		dataDebito = ordenado[i];
-		print "<tr><td>" inverter(dataDebito) "</td><td>" debitos[dataDebito]"€ </td></tr>\n" > file;
+		print "<tr><td>" inverter(dataDebito) "</td><td>" debitos[dataDebito] "€</td></tr>\n" > file;
 	}
 	print "</table></div></div>" > file;
 	printFooter(file, 3); 
