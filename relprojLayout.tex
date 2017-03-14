@@ -169,13 +169,13 @@ De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
   <DATA_DEBITO>05-08-2015</DATA_DEBITO>
   <CARTAO>6749036</CARTAO>
 </TRANSACCAO>
+...
 \end{verbatim}}
 
 \textbf{Rodapé com valores totais:}
 
 {\footnotesize
 \begin{verbatim}
-...
 <TOTAL>77,40</TOTAL>
 </IDENTIFICADOR>
 <TOTAL>77,40</TOTAL>
@@ -203,7 +203,7 @@ Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \tex
 Aqui foi tomada a decisão de escolher como \textit{field separator} os caracteres \textless e \textgreater.
 Cada transação é definida por vários segmentos com o seguinte formato:
 \begin{verbatim}
-<...>...</...>\n
+<...>...</...>
 \end{verbatim}
 Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos referentes à tag em cada linha, obtendo-se a seguinte função:
 
@@ -232,87 +232,125 @@ A escolha do \textbf{RS} permite-nos encontrar, para cada transação, o valor do 
 \item Calcular o número de 'entradas' em cada dia do mês
 
 Para além do número de entradas, extendemos o âmbito da \textit{query} de modo a distinguir as entradas nos diferentes serviços - portagens ou parques de estacionamento.
+O objetivo da inversão da data é permitir, posteriormente, a ordenação.
 
 \begin{verbatim}
-tipo = getValueOf("TIPO");
-data = getValueOf("DATA_ENTRADA");
-  if (tipo != null && data != null && data != "null"){
-    invData = inverter(data);
-    nEntradas[tipo][invData]++;
-  }
+NR > 1  {
+      tipo = getValueOf("TIPO");
+      data = getValueOf("DATA_ENTRADA");
+      if (tipo != null && data != null && data != "null"){
+        invData = inverter(data);
+        nEntradas[tipo][invData]++;
+      }
 }
 \end{verbatim}
 
 Para a impressão dos resultados foi criada uma tabela \textit{html}, porém aqui mostrar-se-á o processo de impressão no terminal para que seja mais fácil explicar o processo.
-Começou-se por separar os resultados por tipo. Em seguida, como se pretendia a impressão ordenada das datas, utilizou-se a função \textit{asorti} para criar um array com as datas ordenadas de forma crescente, iterando-o depois no momento de imprimir o valor do número de entradas.  
+Começou-se por separar os resultados por tipo. Em seguida, como se pretendia a impressão ordenada das datas, utilizou-se a função \textit{asorti} para criar um array com as datas ordenadas de forma crescente, iterando-o depois no momento de imprimir o valor do número de entradas.
+O resultado que é apresentado é a data original (é necessário inverter já que foi invertido anteriormente para se proceder à ordenação) e o número de entradas correspondente a essa data (este valor é obtido no array original, já que estes valores foram perdidos no array ordenado).
 
 \begin{verbatim}
-
-for (i in nEntradas){
-    print i;
-    n = asorti(nEntradas[i], ordenado);
-    for (j=1; j <= n; j++){
-      data = ordenado[j];
-      print inverter(data), nEntradas[i][data];
+END   {
+    for (i in nEntradas){
+      print i;
+      n = asorti(nEntradas[i], ordenado);
+      for (j=1; j <= n; j++){
+        data = ordenado[j];
+        print inverter(data), nEntradas[i][data];
+      }
     }
-  }
+}
 \end{verbatim}
 
 \bigskip
 
 \item Escrever a lista de locais de saída
 
-Como \textit{query} adicional, foi acrescentado a cada local o número de vezes que este foi utilizado como local de saída, bem como o tipo de serviço: \textbf{saídas[tipo][saída]} representa o número de vezes que a saída \textit{saída} foi usada para o serviço \textit{tipo} (Portagem ou Parque de Estacionamento).
+Para esta \textit{query} adicionou-se uma funcionalidade que permite saber, a cada local, o número de vezes que este foi utilizado como local de saída, bem como o tipo de serviço: \textbf{saídas[tipo][saída]} representa o número de vezes que a saída \textit{saída} foi usada para o serviço \textit{tipo} (Portagem ou Parque de Estacionamento).
 
 \begin{verbatim}
-saida = getValueOf("SAIDA");
-  if (tipo != null && saida != null){
-    saidas[tipo][saida]++;
-  }
+NR > 1  {
+      tipo = getValueOf("TIPO");
+      saida = getValueOf("SAIDA");
+      if (tipo != null && saida != null){
+        saidas[tipo][saida]++;
+      }
+}
+\end{verbatim}
 
-for (i in saidas){
-    n = asort(saidas[i], ordenado); 
-    for (j=n; j > 0; j--){
-      numeroSaidas = ordenado[j];
-      for (k in saidas[i]){
-        if (saidas[i][k] == numeroSaidas){
-          print k, numeroSaidas;
-          delete saidas[i][k];
+Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array para que, caso existam várias saídas com o mesmo número de ocorrências, estas não haja repetições nem omissões.
+
+\begin{verbatim}
+END     {
+      for (i in saidas){
+        n = asort(saidas[i], ordenado); 
+        for (j=n; j > 0; j--){
+          numeroSaidas = ordenado[j];
+          for (k in saidas[i]){
+            if (saidas[i][k] == numeroSaidas){
+              print k, numeroSaidas;
+              delete saidas[i][k];
+            }
+          }
         }
       }
-    }
-  }
+}
 \end{verbatim}
 
 \item Calcular o total gasto no mês
 
-\begin{verbatim}
-imp = getValueOf("IMPORTANCIA");
-  desc = getValueOf("VALOR_DESCONTO");
-  if (imp != null && desc != null){
-    gsub(",", ".", imp);
-    total += imp - desc;
-  }
+O total gasto no mês é calculado a partir da soma dos valores das importâncias e a subtração dos descontos.
+É necessário substituir a vírgula 'presente' nos valores por 'ponto' já que, para realizar as operações aritméticas, o separador decimal é o 'ponto'.
 
-print values, "TOTAL", total;
+\begin{verbatim}
+BEGIN   {
+      total = 0;
+}
+
+NR > 1  {
+      imp = getValueOf("IMPORTANCIA");
+      desc = getValueOf("VALOR_DESCONTO");
+      if (imp != null && desc != null){
+        gsub(",", ".", imp);
+        gsub(",", ".", desc);
+        total += imp - desc;
+      }
+}
+
+END     {
+      print "TOTAL", total;
+}
 \end{verbatim}
 
 \item Calcular o total gasto no mês apenas em parques
 
-\begin{verbatim}
-if (tipo != null && imp != null) {
-  tipos[tipo] += imp;
-}
+Nesta \textit{query} decidiu-se generalizar, apresentando os gastos mensais para todos os tipos existentes no extrato. 
+Tal como no cálculo do total gasto no mês, também aqui os "totais" são calculados somando as importâncias e subtraindo os descontos.
 
-n = asort(tipos, ordenado);
-for (i=n; i > 0; i--){
-  valor = ordenado[i];
-  for (j in tipos){
-    if (tipos[j] == valor){
-      print j, valor;
-      delete tipos[j];
-    }
-  }
+\begin{verbatim}
+NR > 1  {
+      tipo = getValueOf("TIPO");
+      imp = getValueOf("IMPORTANCIA");
+      desc = getValueOf("VALOR_DESCONTO");
+      if (tipo != null && imp != null) {
+        tipos[tipo] += imp - desc;
+}
+\end{verbatim}
+
+Para apresentar os resultados, e uma vez que se pretende ordenar pelos valores por ordem descendente, é necessário descobrir os tipos que correspondem a cada valor, já que ao aplicar a função "asort" os índices (que, aqui, são os tipos) são substituidos por números. A função "delete" serve o mesmo propósito explicado numa das queries referidas anteriormente.
+
+\begin{verbatim}
+END     {
+      n = asort(tipos, ordenado);
+      for (i=n; i > 0; i--){
+        valor = ordenado[i];
+        for (j in tipos){
+          if (tipos[j] == valor){
+            print j, valor;
+            delete tipos[j];
+          }
+        }
+      }
 }
 \end{verbatim}
 
