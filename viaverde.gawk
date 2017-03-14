@@ -144,8 +144,10 @@ function printHeader(file, active){
 
 function printFooter(file, active){
 	footer_fmt = "<div class='footer'> <a target='_blank' href='http://www.viaverde.pt'><img src='%s'/></a>";
+	aux = "<div class='footer' style='margin-top:300px'> <a target='_blank' href='http://www.viaverde.pt'><img src='%s'/></a>";
 	switch (active){
-		case 1:
+		case 1: printf(aux, "lib/logo.png") > file;
+				break;
 		case 2:	printf(footer_fmt, "lib/logo.png") > file;
 				break;
 		case 3:	printf(footer_fmt, "../lib/logo.png") > file;
