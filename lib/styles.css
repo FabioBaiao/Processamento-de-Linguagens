@@ -54,13 +54,10 @@ body {
     color: #2196F3;
     text-align: left;
 }
-.avatar {
-    margin: 100px;
-}
 .footer {
     background-color: #444;
     color: white;
-    padding: 15px;
+    padding: 5px;
     bottom: 0;
     position: fixed;
     width: 100%;
@@ -132,9 +129,18 @@ body {
     color: white;
 }
 .avatar{
+    margin: 100px;
     margin-bottom: 40px;
 }
 .maps{
     height: 20px;
     width: 20px;
+}
+.viaverde{
+    height: 50px;
+    width: 50px;
+}
+.foot_label{
+    line-height: 8px;
+    overflow: hidden;
 }
