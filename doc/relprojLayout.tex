@@ -121,7 +121,7 @@ De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
 \end{verbatim}
 }
 
-\textbf{Todas as transações de serviços oferecidos pela ViaVerde (portagens, parques de estacionamento, etc), sendo que cada transação tem campos como: data e hora de entrada e saída, local de entrada e saída, valor, etc:}
+\textbf{Todas as transações de serviços oferecidos pela ViaVerde (portagens, parques de estacionamento, etc), sendo que cada transação tem campos como: data e horas de entrada e saída, local de entrada e saída, valor, etc:}
 
 {\footnotesize
 \begin{verbatim}
@@ -167,13 +167,13 @@ FS = "[<>]";
 
 A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
 
-Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar. A última transação contém, ainda, o rodapé.
+Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar. A última transação contém ainda o rodapé.
 
 Desta forma assegura-se que, ao processar cada transação, todos os dados que se encontrem nesse \textit{record} pertencem à mesma transação.
 
 \section{Field Separator (FS)}
 
-Aqui foi tomada a decisão de escolher como \textit{field separator} os caracteres \textless e \textgreater.
+Aqui foi tomada a decisão de escolher como \textit{field separator} os caracteres \textless\space e \textgreater.
 Cada transação é definida por vários segmentos com o seguinte formato:
 \begin{verbatim}
 <...>...</...>
@@ -258,7 +258,7 @@ NR > 1  {
 }
 \end{verbatim}
 
-Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array (com recurso à função delete) para que, caso existam várias saídas com o mesmo número de ocorrências, estas não se repetiam nem haja omissões.
+Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array (com recurso à função delete) para que, caso existam várias saídas com o mesmo número de ocorrências, estas não se repitam nem haja omissões.
 
 Outro aspeto a considerar é que, já que se pretente apresentar os número de saída por ordem descendente, é necessário iterar do fim até ao início do array ordenado.
 
@@ -331,7 +331,7 @@ END     {
 }
 \end{verbatim}
 
-Para além do total, foi também calculado o valor do iva e o total sem iva. Uma vez que o valor do iva de cada transação está em percentagem é necessário dividir o valor por 100, para poder efetuar os cálculos corretamente.
+Para além do total, foi também calculado o valor do iva e o total sem iva. Uma vez que o valor do iva de cada transação está em percentagem, é necessário dividir o valor por 100 para poder efetuar os cálculos corretamente.
 
 \begin{verbatim}
 BEGIN   {
@@ -459,7 +459,7 @@ END     {
 
 \item Dados do Cliente
 
-Para terminar, foi criada uma querie que permite apresentar os dados do cliente. Uma vez que estes dados se encontram no cabeçalho esta querie é executada apenas uma vez no \textit{number of records} = 1. Os dados do cliente encontram-se entre as tags \textbf{\textless CLIENTE\textgreater} e \textbf{\textless CLIENTE\textgreater}. Assim o algoritmo a seguir apresentado imprime todos os dados do cliente que se encontrem entre estas duas tags.
+Para terminar, foi criada uma querie que permite apresentar os dados do cliente. Uma vez que estes dados se encontram no cabeçalho esta querie é executada apenas uma vez, no \textit{number of records} = 1. Os dados do cliente encontram-se entre as tags \textbf{\textless CLIENTE\textgreater} e \textbf{\textless/CLIENTE\textgreater}. Assim o algoritmo a seguir apresentado imprime todos os dados do cliente que se encontrem entre estas duas tags.
 
 Desta forma o número de dados pode variar de extrato para extrato, sendo os dados presentes nesses extratos sempre apresentados, independentemente do seu número.
 
@@ -525,7 +525,7 @@ Abrindo o menu principal aparece o seguinte resultado:
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Menu-Principal.png}
+\includegraphics[width=120mm, scale=0.5]{Menu-Principal.png}
 \caption{\label{fig:change}Menu Principal.}
 \end{figure}
 
@@ -533,43 +533,43 @@ Utilizando o menu de navegação superior para clicar em Cliente, obtem-se a págin
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Dados-Cliente.png}
+\includegraphics[width=120mm, scale=0.5]{Dados-Cliente.png}
 \caption{\label{fig:change}Dados do Cliente.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Numero-Entradas.png}
+\includegraphics[width=120mm, scale=0.5]{Numero-Entradas.png}
 \caption{\label{fig:change}Número de entradas em cada dia.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Locais-Entrada.png}
+\includegraphics[width=120mm, scale=0.5]{Locais-Entrada.png}
 \caption{\label{fig:change}Locais de entrada e número de visitas.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Locais-Saida.png}
+\includegraphics[width=120mm, scale=0.5]{Locais-Saida.png}
 \caption{\label{fig:change}Locais de saída e número de visitas.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Gasto-Mensal.png}
+\includegraphics[width=120mm, scale=0.5]{Gasto-Mensal.png}
 \caption{\label{fig:change}Gastos mensais.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Gasto-Diario.png}
+\includegraphics[width=120mm, scale=0.5]{Gasto-Diario.png}
 \caption{\label{fig:change}Gastos diários.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=100mm, scale=0.5]{Debito-Diario.png}
+\includegraphics[width=120mm, scale=0.5]{Debito-Diario.png}
 \caption{\label{fig:change}Débitos diários.}
 \end{figure}
 
