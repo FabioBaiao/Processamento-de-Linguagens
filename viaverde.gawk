@@ -12,7 +12,8 @@ BEGIN {
 	fmt = "<li><a href='%s'> %s </a></li>\n";
 	menu_active = "<li><a href='%s' class='active'> %s </a></li>";
 	title = "<div class='column content'><div class='header'><h4 style='color:#008CBA;'> %s </h4></div>";
-	maps = "<a target='_blank' href='https://www.google.pt/maps/place/%s+Portugal'><img class='maps' src='../lib/google_maps.png'/></a>";
+	maps_addr = "<a target='_blank' href='https://www.google.pt/maps/place/%s+Portugal'>";
+	maps_img = "<img class='maps' src='../lib/google_maps.png'/></a>";
 }
 
 # HEADER
@@ -144,10 +145,8 @@ function printHeader(file, active){
 
 function printFooter(file, active){
 	footer_fmt = "<div class='footer'> <a target='_blank' href='http://www.viaverde.pt'><img src='%s'/></a>";
-	aux = "<div class='footer' style='margin-top:300px'> <a target='_blank' href='http://www.viaverde.pt'><img src='%s'/></a>";
 	switch (active){
-		case 1: printf(aux, "lib/logo.png") > file;
-				break;
+		case 1: 
 		case 2:	printf(footer_fmt, "lib/logo.png") > file;
 				break;
 		case 3:	printf(footer_fmt, "../lib/logo.png") > file;
@@ -226,7 +225,7 @@ function printA(){
 	printHeader(file, 3);
 	printSideMenu(file, 1);
 	printf(title, "Número de entradas em cada dia, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table class='center' style='width:30%'>" > file;
+	print "<table class='center'>" > file;
 	for (i in nEntradas){
 		print "<tr><th>" i "</th></tr>" > file;
 		n = asorti(nEntradas[i], ordenado);
@@ -245,7 +244,7 @@ function printEntradas(){
 	printHeader(file, 3);
 	printSideMenu(file, 2);
 	printf (title, "Locais de entrada e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table class='center' style='width:30%'>" > file;
+	print "<table class='center'>" > file;
 	for (i in entradas){
 		print "<tr><th>" i "</th></tr>" > file;
 		n = asort(entradas[i], ordenado);	
@@ -254,7 +253,8 @@ function printEntradas(){
 			for (k in entradas[i]){
 				if (entradas[i][k] == numeroEntradas){
 					print "<tr><td>" k > file;
-					printf(maps, k) > file;
+					printf(maps_addr, k) > file;
+					print maps_img > file;
 					print "</td><td>" numeroEntradas "</td></tr>\n" > file;
 					delete entradas[i][k];
 				}
@@ -270,7 +270,7 @@ function printB(){
 	printHeader(file, 3);
 	printSideMenu(file, 3);
 	printf (title, "Locais de saída e respetivo número de visitas, nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table class='center' style='width:30%'>" > file;
+	print "<table class='center'>" > file;
 	for (i in saidas){
 		print "<tr><th>" i "</th></tr>" > file;
 		n = asort(saidas[i], ordenado);	
@@ -279,7 +279,8 @@ function printB(){
 			for (k in saidas[i]){
 				if (saidas[i][k] == numeroSaidas){
 					print "<tr><td>" k > file;
-					printf(maps, k) > file;
+					printf(maps_addr, k) > file;
+					print maps_img > file;
 					print "</td><td>" numeroSaidas "</td></tr>\n" > file;
 					delete saidas[i][k];
 				}
@@ -296,7 +297,7 @@ function printCD(){
 	printHeader(file, 3);
 	printSideMenu(file, 4);
 	printf (title, "Gasto mensal nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table class='center' style='width:50%'>" > file;
+	print "<table class='center' style='width:70%'>" > file;
 	print "<tr><th> Serviço </th><th> Montante </th></tr>" > file;
 	n = asort(tipos, ordenado);
 	for (i=n; i > 0; i--){
@@ -326,7 +327,8 @@ function printCliente(){
 		if ($i ~ /CLIENTE/){
 			for (i += 2; $i !~ /CLIENTE/; i+=4){
 				gsub("_", " ", $i);
-				print "<tr><th style='text-align:left'>"$i"</th><td style='text-align:left'>"$(i+1)"</td></tr>" > file;
+				print "<tr><th style='text-align:left'>"$i"</th>" > file;
+				print "<td style='text-align:left'>"$(i+1)"</td></tr>" > file;
 			}
 			break;
 		}
@@ -341,7 +343,7 @@ function printGastoD(){
 	printHeader(file, 3);
 	printSideMenu(file, 5);
 	printf (title, "Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde") > file;
-	print "<table class='center' style='width:50%'>" > file;
+	print "<table class='center' style='width:70%'>" > file;
 	print "<tr><th> Dia </th><th> Serviço </th><th> Montante </th></tr>" > file;
 	n = asorti(gastoD, ordenado);
 	for (j=1; j <= n; j++){
@@ -360,7 +362,7 @@ function printDebitos(){
 	printHeader(file, 3);
 	printSideMenu(file, 6);
 	printf (title, "Débitos realizados por dia nos serviços da Via Verde") > file;
-	print "<table class='center' style='width:50%'>" > file;
+	print "<table class='center' style='width:70%'>" > file;
 	print "<tr><th> Dia </th><th> Montante </th></tr>" > file;
 	n = asorti(debitos, ordenado);
 	for (i=1; i <= n; i++){
