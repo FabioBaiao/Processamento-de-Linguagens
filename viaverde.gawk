@@ -44,15 +44,17 @@ NR > 1 {
 
 	# alínea c)
 	imp = getValueOf("IMPORTANCIA");
+	gsub(",", ".", imp);
 	desc = getValueOf("VALOR_DESCONTO");
+	gsub(",", ".", imp);
 	if (imp != null && desc != null){
-		gsub(",", ".", imp);
 		total += imp - desc;
 	}
 
 	# alínea d)
-	if (tipo != null && imp != null)
-		tipos[tipo] += imp;
+	if (tipo != null && imp != null){
+		tipos[tipo] += imp; - desc;
+	}
 
 	# calcular iva e valor sem iva
 	ivaPerc = getValueOf("TAXA_IVA");
