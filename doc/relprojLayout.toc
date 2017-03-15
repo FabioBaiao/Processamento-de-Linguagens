@@ -1,0 +1,14 @@
+\select@language {portuges}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{2}
+\contentsline {chapter}{\numberline {2}Estrutura do Ficheiro XML}{3}
+\contentsline {chapter}{\numberline {3}Apresenta\c c\~ao da Solu\c c\~ao de Leitura e Parser}{4}
+\contentsline {section}{\numberline {3.1}Record Separator (RS)}{4}
+\contentsline {section}{\numberline {3.2}Field Separator (FS)}{4}
+\contentsline {chapter}{\numberline {4}Apresenta\c c\~ao das Queries e Resolu\c c\~oes}{5}
+\contentsline {section}{\numberline {4.1}Queries de Resolu\c c\~ao Obrigat\'oria}{5}
+\contentsline {section}{\numberline {4.2}Queries Adicionais}{8}
+\contentsline {section}{\numberline {4.3}Outros esclarecimentos}{10}
+\contentsline {chapter}{\numberline {5}Apresenta\c c\~ao de Resultados}{11}
+\contentsline {section}{\numberline {5.1}Execu\c c\~ao}{11}
+\contentsline {section}{\numberline {5.2}Exemplos}{11}
+\contentsline {chapter}{\numberline {6}Conclus\~ao}{16}
