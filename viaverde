@@ -44,22 +44,20 @@ NR > 1 {
 
 	# alínea c)
 	imp = getValueOf("IMPORTANCIA");
-	gsub(",", ".", imp);
 	desc = getValueOf("VALOR_DESCONTO");
-	gsub(",", ".", imp);
 	if (imp != null && desc != null){
+		gsub(",", ".", imp);
 		total += imp - desc;
 	}
 
 	# alínea d)
-	if (tipo != null && imp != null && desc != null){
-		tipos[tipo] += imp - desc;
-	}
+	if (tipo != null && imp != null)
+		tipos[tipo] += imp;
 
 	# calcular iva e valor sem iva
 	ivaPerc = getValueOf("TAXA_IVA");
-	if (ivaPerc != null && imp != null && desc != null){
-		semIva = imp / (1 + ivaPerc/100) - desc;
+	if (ivaPerc != null && imp != null){
+		semIva = imp / (1 + ivaPerc/100);
 
 		semIvaTotal += semIva;
 		ivaTotal += semIva * (ivaPerc/100);
@@ -72,16 +70,16 @@ NR > 1 {
 	}
 
 	# gasto diário
-	if (tipo != null && data != null && data != "null" && imp != null && desc != null){
+	if (tipo != null && data != null && data != "null"){
 		invData = inverter(data);
 		gastoD[invData][tipo] += imp - desc;
 	}
 
 	# debitos
 	dataDebito = getValueOf("DATA_DEBITO");
-	if (dataDebito != null && imp != null && desc != null){
+	if (dataDebito != null && imp != null){
 		invData = inverter(dataDebito);
-		debitos[invData] += imp - desc;
+		debitos[invData] += imp;
 	}
 }
 
@@ -146,14 +144,15 @@ function printHeader(file, active){
 }
 
 function printFooter(file, active){
-	footer_fmt = "<div class='footer'> <a target='_blank' href='http://www.viaverde.pt'><img src='%s'/></a>";
+	footer_fmt = "<div class='footer'> <a target='_blank' href='http://www.viaverde.pt'><img class='viaverde' src='%s'/></a>";
 	switch (active){
 		case 1: 
 		case 2:	printf(footer_fmt, "lib/logo.png") > file;
 				break;
 		case 3:	printf(footer_fmt, "../lib/logo.png") > file;
 	}
-	print "<h1>Via Verde</h1><h3>Parar para quê?</h3> </div></body></html>" > file;
+	print "<div class='foot_label'><p style='color:#4CAF50'>Via Verde</p>" > file;
+	print "<p style='font-size:small'>Parar para quê?</p></div></div></body></html>" > file;
 }
 
 function printExtrato(){
@@ -306,7 +305,7 @@ function printCD(){
 		valor = ordenado[i];
 		for (j in tipos){
 			if (tipos[j] == valor){
-				printf ("<tr><td> %s </td><td> %.2f€</td></tr>\n", j, valor) > file;
+				print "<tr><td>" j "</td><td>" valor "€</td></tr>\n" > file;
 				delete tipos[j];
 			}
 		}
@@ -351,7 +350,7 @@ function printGastoD(){
 	for (j=1; j <= n; j++){
 		data = ordenado[j];
 		for (k in gastoD[data]){
-				printf ("<tr><td> %s </td><td> %s </td><td> %.2f€</td></tr>\n", inverter(data), k, gastoD[data][k]) > file;
+				print "<tr><td>" inverter(data) "</td><td>" k "</td><td>" gastoD[data][k] "€</td></tr>\n" > file;
 				delete gastoD[i][k];
 		}
 	}
@@ -369,7 +368,7 @@ function printDebitos(){
 	n = asorti(debitos, ordenado);
 	for (i=1; i <= n; i++){
 		dataDebito = ordenado[i];
-		printf ("<tr><td> %s </td><td> %.2f€</td></tr>\n", inverter(dataDebito), debitos[dataDebito]) > file;
+		print "<tr><td>" inverter(dataDebito) "</td><td>" debitos[dataDebito] "€</td></tr>\n" > file;
 	}
 	print "</table></div></div>" > file;
 	printFooter(file, 3); 
