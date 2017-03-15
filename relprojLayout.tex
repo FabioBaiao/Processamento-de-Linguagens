@@ -95,13 +95,15 @@ O primeiro contacto com as expressões regulares despertou grande curiosidade, da
 
 A escolha recaiu no tema da Via Verde devido à clareza do enunciado e à utilidade do tema, uma vez que este tipo de processador de transações pode ser aplicado nas mais diversas áreas.
 
+Um dos principais objetivos na realização deste projeto é criar um processador de texto geral, permitindo pequenas alterações na estrutura dos ficheiros sem que comprometam os resultados apresentados.
+
 \cleardoublepage
 
 \chapter{Estrutura do Ficheiro XML} \
 De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
 
 
-\textbf{Cabeçalho com informação sobre o mês a que se refere o extrato e os dados do cliente:}
+\textbf{Cabeçalho com informação sobre o mês a que se refere o extrato, os dados do cliente, etc:}
 
 {\footnotesize
 \begin{verbatim}
@@ -166,7 +168,9 @@ FS = "[<>]";
 
 A opção passou por separar os \textit{records} pela tag \textbf{\textless TRANSACAO\textgreater}.\\
 
-Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar.
+Com o \textit{Record Separator} definido desta forma sabe-se que o primeiro \textit{record} corresponde ao cabeçalho, enquanto que os restantes irão corresponder às transações a analisar. A última transação contém, ainda, o rodapé.
+
+Desta forma assegura-se que, ao processar cada transação, todos os dados que se encontrem nesse \textit{record} pertencem à mesma transação.
 
 \section{Field Separator (FS)}
 
@@ -175,7 +179,7 @@ Cada transação é definida por vários segmentos com o seguinte formato:
 \begin{verbatim}
 <...>...</...>
 \end{verbatim}
-Com o \textit{field separator} que foi anunciado anteriormente, os dados relevantes para análise encontrar-se-ão sempre no segundo (tag) e terceiro (valor) campo de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos referentes à tag em cada linha, obtendo-se a seguinte função:
+Com este \textit{field separator}, os dados relevantes para análise encontrar-se-ão sempre no segundo e terceiro campo (tag e valor, respetivamente) de cada linha. Desta forma, para se obter o valor de determinada tag, basta iterar pelos campos referentes à tag em cada linha, obtendo-se a seguinte função:
 
 \begin{verbatim}
 function getValueOf (tag){
@@ -188,13 +192,17 @@ function getValueOf (tag){
 }
 \end{verbatim} 
 
+Com esta função a obtenção do valor de determinada tag não depende da ordem que esta aparece no ficheiro XML.
+
 \chapter{Apresentação das Queries e Resoluções}
+
+Neste capítulo serão explicadas as queries realizadas. Na primeira secção apresentar-se-á as queries obrigatórias sendo, de seguida, apresentadas as queries criadas adicionalmente pelo grupo.
 
 \section{Queries de Resolução Obrigatória}
 
 \bigskip
 
-A escolha do \textbf{RS} permite-nos encontrar, para cada transação, o valor do campo que pretendemos, invocando somente a função \textit{getValueOf}, sendo o argumento esse mesmo campo. 
+A escolha dos \textbf{RS} e \textbf{FS} permite-nos encontrar, para cada transação, o valor do campo que pretendemos, invocando somente a função \textit{getValueOf}, sendo o argumento esse mesmo campo. 
 
 \bigskip
 
@@ -202,7 +210,8 @@ A escolha do \textbf{RS} permite-nos encontrar, para cada transação, o valor do 
 \item Calcular o número de 'entradas' em cada dia do mês
 
 Para além do número de entradas, extendemos o âmbito da \textit{query} de modo a distinguir as entradas nos diferentes serviços - portagens ou parques de estacionamento.
-O objetivo da inversão da data é permitir, posteriormente, a ordenação. A função inverter usa a função split para dividir a data em dia, mês e ano, com o separador "-". 
+
+O objetivo da inversão da data é permitir, posteriormente, a ordenação. A função inverter usa a função split para dividir a data em dia, mês e ano, com o separador -. 
 
 \begin{verbatim}
 NR > 1  {
@@ -216,7 +225,9 @@ NR > 1  {
 \end{verbatim}
 
 Para a impressão dos resultados foi criada uma tabela \textit{html}, porém aqui mostrar-se-á o processo de impressão no terminal para que seja mais fácil explicar o processo.
+
 Começou-se por separar os resultados por tipo. Em seguida, como se pretendia a impressão ordenada das datas, utilizou-se a função \textit{asorti} para criar um array com as datas ordenadas de forma crescente, iterando-o depois no momento de imprimir o valor do número de entradas.
+
 O resultado que é apresentado é a data original (é necessário inverter já que foi invertido anteriormente para se proceder à ordenação) e o número de entradas correspondente a essa data (este valor é obtido no array original, já que estes valores foram perdidos no array ordenado).
 
 \begin{verbatim}
@@ -236,7 +247,7 @@ END     {
 
 \item Escrever a lista de locais de saída
 
-Para esta \textit{query} adicionou-se uma funcionalidade que permite saber, a cada local, o número de vezes que este foi utilizado como local de saída, bem como o tipo de serviço: \textbf{saídas[tipo][saída]} representa o número de vezes que a saída \textit{saída} foi usada para o serviço \textit{tipo} (Portagem ou Parque de Estacionamento).
+Para esta \textit{query} adicionou-se uma funcionalidade que permite saber, a cada local, o número de vezes que este foi utilizado como local de saída, bem como o tipo de serviço. O valor de \textbf{saidas[tipo][saida]} representa o número de vezes que a saída \textit{saida} foi usada para o serviço \textit{tipo}.
 
 \begin{verbatim}
 NR > 1  {
@@ -248,7 +259,8 @@ NR > 1  {
 }
 \end{verbatim}
 
-Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array para que, caso existam várias saídas com o mesmo número de ocorrências, estas não haja repetições nem omissões.
+Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array (com recurso à função delete) para que, caso existam várias saídas com o mesmo número de ocorrências, estas não se repetiam nem haja omissões.
+
 Outro aspeto a considerar é que, já que se pretente apresentar os número de saída por ordem descendente, é necessário iterar do fim até ao início do array ordenado.
 
 \begin{verbatim}
@@ -298,7 +310,7 @@ END     {
 \item Calcular o total gasto no mês
 
 O total gasto no mês é calculado a partir da soma dos valores das importâncias e a subtração dos descontos.
-É necessário substituir a vírgula 'presente' nos valores por 'ponto' já que, para realizar as operações aritméticas, o separador decimal é o 'ponto'.
+É necessário substituir a 'vírgula', presente nos valores, por 'ponto' já que, para realizar as operações aritméticas, o separador decimal é o 'ponto'.
 
 \begin{verbatim}
 BEGIN   {
@@ -333,6 +345,9 @@ NR > 1  {
       desc = getValueOf("VALOR_DESCONTO");
       ivaPerc = getValueOf("TAXA_IVA");
       if (ivaPerc != null && imp != null && desc != null){
+        gsub(",", ".", imp);
+        gsub(",", ".", desc);
+
         semIva = imp / (1 + ivaPerc/100) - desc;
 
         semIvaTotal += semIva;
@@ -348,8 +363,7 @@ END     {
 
 \item Calcular o total gasto no mês apenas em parques
 
-Nesta \textit{query} decidiu-se generalizar, apresentando os gastos mensais para todos os tipos existentes no extrato. 
-Tal como no cálculo do total gasto no mês, também aqui os "totais" são calculados somando as importâncias e subtraindo os descontos.
+Nesta \textit{query} decidiu-se generalizar, apresentando os gastos mensais para todos os tipos existentes no extrato. Tal como no cálculo do total gasto no mês, também aqui os "totais" são calculados somando as importâncias e subtraindo os descontos.
 
 \begin{verbatim}
 NR > 1  {
@@ -357,7 +371,10 @@ NR > 1  {
       imp = getValueOf("IMPORTANCIA");
       desc = getValueOf("VALOR_DESCONTO");
       if (tipo != null && imp != null) {
+        gsub(",", ".", imp);
+        gsub(",", ".", desc);
         tipos[tipo] += imp - desc;
+      }
 }
 \end{verbatim}
 
@@ -386,13 +403,17 @@ END     {
 
 \item Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde
 
-Mais uma vez, inverte-se a data para permitir, posteriormente, a ordenação. Em cada transação calcula-se o valor gasto, somando-o ao gasto, para a data e tipo dessa transação, já calculado. 
+Mais uma vez, inverte-se a data para permitir, posteriormente, a ordenação. Em cada transação calcula-se o valor gasto nessa transação, somando-o ao gasto, para a data e tipo dessa transação, já calculado. 
 
 \begin{verbatim}
 NR > 1  {
       tipo = getValueOf("TIPO");
       data = getValueOf("DATA_ENTRADA");
-      if (tipo != null && data != null && data != "null"){
+      imp = getValueOf("IMPORTANCIA");
+      desc = getValueOf("VALOR_DESCONTO");
+      if (tipo != null && data != null && data != "null" && imp != null && desc != null){
+        gsub(",", ".", imp);
+        gsub(",", ".", desc);
         invData = inverter(data);
         gastoD[invData][tipo] += imp - desc;
       }
@@ -412,12 +433,17 @@ END     {
 
 \item Débitos realizados por dia nos serviços Via Verde
 
-Tal como nas outras queries, para apresentar os resultados ordenados pela data é necessário invertê-la. Neste caso, as datas utilizadas são as datas referentes à tag \verb|DATA_DEBITO|.
+Tal como nas outras queries, para apresentar os resultados ordenados pela data é necessário invertê-la. Neste caso, as datas utilizadas são as datas referentes à tag \verb|DATA_DEBITO|. O valor debitado é calculado, tal como nas outras queries, subtraindo o valor do desconto à importância.
 
 \begin{verbatim}
 NR > 1  {
       dataDebito = getValueOf("DATA_DEBITO");
-      if (dataDebito != null && imp != null){
+      imp = getValueOf("IMPORTANCIA");
+      desc = getValueOf("VALOR_DESCONTO");
+      if (dataDebito != null && imp != null && desc != null){
+        gsub(",", ".", imp);
+        gsub(",", ".", desc);
+
         invData = inverter(dataDebito);
         debitos[invData] += imp - desc;
       }
@@ -435,6 +461,32 @@ END     {
 \end{enumerate}
 
 \chapter{Conclusão} \label{concl}
+Para a explicação do relatório optou-se por mostrar as queries separadamente. No entanto, no projeto criado, as queries encontram-se todas no mesmo ficheiro. Assim sendo, existem algumas alterações, como por exemplo, a invocação da função getValueOf apenas é realizada uma vez para cada tag. Também a função gsub é invocada apenas uma vez para cada valor (importância e desconto), não estando, portanto, no corpo de cada if.
+
+\bigskip
+
+Outro aspeto omitido na explicação das queries foi o facto de a apresentação dos dados ter sido feita em HTML. Cada querie é apresentada em páginas HTML diferentes, tal como a página principal e a página dos dados do cliente. O grupo decidiu, então, criar o ficheiro HTML, correspondente à página principal, com o nome do mês a que se refere o extrato, sendo que todas as queries estarão numa pasta com o mesmo nome. Com isto, é possível processar vários ficheiros, com extratos referentes a meses diferentes, sem que nenhum dos ficheiros HTML seja perdido. O HTML que contêm os dados do cliente é, no entanto, atualizado de acordo com o último XML processado.
+
+O mês de emissão e a criação das pastas é efetuada da seguinte forma:
+
+\begin{verbatim}
+NR == 1 {
+  extrato = getMesEmissao();
+
+  system("mkdir -p " extrato);
+}
+
+function getMesEmissao(){
+  
+  for (i=1; i < NF; i++){
+    if ($i == "MES_EMISSAO")
+      return $(i+1)
+  }
+}
+\end{verbatim}
+
+\bigskip
+
 Concluído o projeto, destaca-se a facilidade que o filtro de texto permite na recolha de informações do ficheiro. Após a escolha dos \textbf{RS} e \textbf{FS} apropriados, tornou-se simples responder às \textit{queries} que nos iam surgindo ao longo do desenvolvimento do projeto.
 
 Por outro lado, sublinha-se a criação de uma página \textit{HTML} para a apresentação dos dados, pois tratou-se da nossa primeira experiência com \textit{HTML} e com resultados, a nosso ver, bastante apelativos.
