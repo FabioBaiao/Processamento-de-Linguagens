@@ -82,9 +82,8 @@
 \maketitle
 
 \begin{abstract}
-\textit{Regular expressions} can be very useful. This project intends to prove exactly this point, showing how to use them in a subject that makes part of our daily routine.
-
-Via Verde is an electronical toll collection system used in Portugal since 1991. The stock for this project is a monthly extract from one of its users, which will be used to answer some queries using \textbf{GAWK}, one of the most prominent text-processing utility on GNU/Linux.
+A Via Verde é um sistema eletrónico de portagens usado em Portugal desde 1991.A \textit{matéria-prima} para este projeto é um extrato mensal de um dos seus utilizadores, o qual será utilizado para responder a diversas \textit{queries} usando \textbf{GAWK}, uma das ferramentas de processamento de texto mais eficientes do GNU/Linux.
+As expressões regulares são padrões aos quais o mecanismo de expressões regulares tenta corresponder no texto de entrada. Neste trabalho, a conjugação do \textbf{GAWK} com \textbf{Expressões Regulares} acarreta o objetivo de demonstrar a utilidade e o poder destas ferramentas na resolução de um problema do quotidiano.
 \end{abstract}
 
 \tableofcontents
@@ -460,12 +459,13 @@ END     {
 
 \end{enumerate}
 
-\chapter{Conclusão} \label{concl}
+\section{Outros esclarecimentos}
+
 Para a explicação do relatório optou-se por mostrar as queries separadamente. No entanto, no projeto criado, as queries encontram-se todas no mesmo ficheiro. Assim sendo, existem algumas alterações, como por exemplo, a invocação da função getValueOf apenas é realizada uma vez para cada tag. Também a função gsub é invocada apenas uma vez para cada valor (importância e desconto), não estando, portanto, no corpo de cada if.
 
 \bigskip
 
-Outro aspeto omitido na explicação das queries foi o facto de a apresentação dos dados ter sido feita em HTML. Cada querie é apresentada em páginas HTML diferentes, tal como a página principal e a página dos dados do cliente. O grupo decidiu, então, criar o ficheiro HTML, correspondente à página principal, com o nome do mês a que se refere o extrato, sendo que todas as queries estarão numa pasta com o mesmo nome. Com isto, é possível processar vários ficheiros, com extratos referentes a meses diferentes, sem que nenhum dos ficheiros HTML seja perdido. O HTML que contêm os dados do cliente é, no entanto, atualizado de acordo com o último XML processado.
+Outro aspeto omitido na explicação das queries foi o facto de a apresentação dos dados ter sido feita em \textit{HTML}. Cada querie é apresentada em páginas HTML diferentes, tal como a página principal e a página dos dados do cliente. O grupo decidiu, então, criar o ficheiro HTML, correspondente à página principal, com o nome do mês a que se refere o extrato, sendo que todas as queries estarão numa pasta com o mesmo nome. Com isto, é possível processar vários ficheiros, com extratos referentes a meses diferentes, sem que nenhum dos ficheiros HTML seja perdido. O HTML que contém os dados do cliente é, no entanto, atualizado de acordo com o último XML processado.
 
 O mês de emissão e a criação das pastas é efetuada da seguinte forma:
 
@@ -485,11 +485,11 @@ function getMesEmissao(){
 }
 \end{verbatim}
 
-\bigskip
+\chapter{Conclusão} \label{concl}
 
-Concluído o projeto, destaca-se a facilidade que o filtro de texto permite na recolha de informações do ficheiro. Após a escolha dos \textbf{RS} e \textbf{FS} apropriados, tornou-se simples responder às \textit{queries} que nos iam surgindo ao longo do desenvolvimento do projeto.
+Concluído o projeto, destaca-se a facilidade que o filtro de texto permite na recolha de informações do ficheiro. Após a escolha dos \textbf{RS} e \textbf{FS} apropriados, tornou-se simples responder às \textit{queries} que nos iam surgindo ao longo do desenvolvimento do projeto. Esta mesma escolha conduziu a uma divisão por campos que, aliada à forma como se procedeu à iteração por estes mesmos campos, acabou por reduzir a necessidade de expressões regulares na filtragem do texto.
 
-Por outro lado, sublinha-se a criação de uma página \textit{HTML} para a apresentação dos dados, pois tratou-se da nossa primeira experiência com \textit{HTML} e com resultados, a nosso ver, bastante apelativos.
+Por outro lado, sublinha-se a criação de uma página \textit{HTML} para a apresentação dos dados, pois tratou-se da primeira experiência do grupo com \textit{HTML} e com resultados, a nosso ver, bastante apelativos.
 
 Quanto a trabalho futuro, a interpretação de um ficheiro com extratos de vários meses seria o passo seguinte lógico deste tipo de projeto.
 
