@@ -72,7 +72,7 @@ NR > 1 {
 	}
 
 	# gasto diário
-	if (tipo != null && data != null && data != "null"){
+	if (tipo != null && data != null && data != "null" && imp != null && desc != null){
 		invData = inverter(data);
 		gastoD[invData][tipo] += imp - desc;
 	}
