@@ -8,6 +8,7 @@
 
 \usepackage{url}
 \usepackage{enumerate}
+\usepackage{textcomp}
 
 %\usepackage{alltt}
 %\usepackage{fancyvrb}
@@ -84,8 +85,6 @@
 \textit{Regular expressions} can be very useful. This project intends to prove exactly this point, showing how to use them in a subject that makes part of our daily routine.
 
 Via Verde is an electronical toll collection system used in Portugal since 1991. The stock for this project is a monthly extract from one of its users, which will be used to answer some queries using \textbf{GAWK}, one of the most prominent text-processing utility on GNU/Linux.
-
-%NÂO GOSTO DISTO EM INGLÊS!!
 \end{abstract}
 
 \tableofcontents
@@ -95,35 +94,6 @@ Via Verde is an electronical toll collection system used in Portugal since 1991.
 O primeiro contacto com as expressões regulares despertou grande curiosidade, dada a capacidade de analisar e interpretar um ficheiro de texto, que pode ser longo, em pouco tempo, recolhendo de uma só vez informação suficiente para responder a várias interrogações. Este trabalho permitirá comprovar essa utilidade e eficiência do \textbf{GAWK}, aplicando-o a um exemplo prático do dia-a-dia.
 
 A escolha recaiu no tema da Via Verde devido à clareza do enunciado e à utilidade do tema, uma vez que este tipo de processador de transações pode ser aplicado nas mais diversas áreas.
-
-%Aqui há um problema. Eu sei que no enunciado fala muito em expressões regulares, só que nós não temos quase nenhuma...
-%Por isso não sei se é boa ideia falarmos muito neste aspeto.
-
-
-%\titulo{Um belo Projeto}
-
-
-%\begin{description}
-%  \item [Enquadramento] \textbf{bla bla} bla bla
-%  \item [Conteúdo do documento] \textsf{ble ble} \texttt{ble} ble
-%  \item [Resultados -- pontos a evidenciar] \textit{bli bli bli bli}
-%  \item [Estrutura do documento] \underline{blo blo blo}
-%\end{description}
-
-
-%Mais exemplos de listas enumeradas mas agora com letras:
-%\begin{enumerate}[a)]
-%\item Listar todas as Pessoas identificadas, sem repetições;
-%\item Listar os Países e Cidades marcadas;
-%\item Listar as Organizações.
-%\end{enumerate}
-
-%A mesma enumeração mas no standard numérico
-%\begin{description}
-%\item[Etape 1:] Listar todas as Pessoas identificadas, sem repetições;
-%\item[Etape 2:] Listar os Países e Cidades marcadas;
-%\item[Etape 3:] Listar as Organizações.
-%\end{description} 
 
 \cleardoublepage
 
@@ -346,7 +316,7 @@ NR > 1  {
 }
 
 END     {
-      printf ("TOTAL %.2f€", total);
+      printf ("TOTAL %.2f", total);
 }
 \end{verbatim}
 
@@ -371,8 +341,8 @@ NR > 1  {
 }
 
 END     {
-      printf ("Total sem IVA %.2f€", semIvaTotal);
-      printf ("IVA %.2f€", ivaTotal);
+      printf ("Total sem IVA %.2f", semIvaTotal);
+      printf ("IVA %.2f", ivaTotal);
 }
 \end{verbatim}
 
@@ -400,7 +370,7 @@ END     {
         valor = ordenado[i];
         for (j in tipos){
           if (tipos[j] == valor){
-            printf (%s %.2f€", j, valor);
+            printf (%s %.2f", j, valor);
             delete tipos[j];
           }
         }
@@ -433,7 +403,7 @@ END     {
       for (j=1; j <= n; j++){
         data = ordenado[j];
         for (k in gastoD[data]){
-          printf ("%s %s %.2f€", inverter(data), k, gastoD[data][k]);
+          printf ("%s %s %.2f", inverter(data), k, gastoD[data][k]);
           delete gastoD[i][k];
         }
       }
@@ -442,7 +412,7 @@ END     {
 
 \item Débitos realizados por dia nos serviços Via Verde
 
-Tal como nas outras queries, para apresentar os resultados ordenados pela data é necessário invertê-la. Neste caso, as datas utilizadas são as datas referentes à tag DATA_DEBITO.
+Tal como nas outras queries, para apresentar os resultados ordenados pela data é necessário invertê-la. Neste caso, as datas utilizadas são as datas referentes à tag \verb|DATA_DEBITO|.
 
 \begin{verbatim}
 NR > 1  {
@@ -457,7 +427,7 @@ END     {
       n = asorti(debitos, ordenado);
       for (i=1; i <= n; i++){
         dataDebito = ordenado[i];
-        printf ("%s %.f€", inverter(dataDebito), debitos[dataDebito]);
+        printf ("%s %.f", inverter(dataDebito), debitos[dataDebito]);
       }
 }
 \end{verbatim}
