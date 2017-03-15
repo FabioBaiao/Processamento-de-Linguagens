@@ -52,14 +52,14 @@ NR > 1 {
 	}
 
 	# alínea d)
-	if (tipo != null && imp != null){
-		tipos[tipo] += imp; - desc;
+	if (tipo != null && imp != null && desc != null){
+		tipos[tipo] += imp - desc;
 	}
 
 	# calcular iva e valor sem iva
 	ivaPerc = getValueOf("TAXA_IVA");
-	if (ivaPerc != null && imp != null){
-		semIva = imp / (1 + ivaPerc/100);
+	if (ivaPerc != null && imp != null && desc != null){
+		semIva = imp / (1 + ivaPerc/100) - desc;
 
 		semIvaTotal += semIva;
 		ivaTotal += semIva * (ivaPerc/100);
@@ -79,9 +79,9 @@ NR > 1 {
 
 	# debitos
 	dataDebito = getValueOf("DATA_DEBITO");
-	if (dataDebito != null && imp != null){
+	if (dataDebito != null && imp != null && desc != null){
 		invData = inverter(dataDebito);
-		debitos[invData] += imp;
+		debitos[invData] += imp - desc;
 	}
 }
 
@@ -306,7 +306,7 @@ function printCD(){
 		valor = ordenado[i];
 		for (j in tipos){
 			if (tipos[j] == valor){
-				print "<tr><td>" j "</td><td>" valor "€</td></tr>\n" > file;
+				printf ("<tr><td> %s </td><td> %.2f€</td></tr>\n", j, valor) > file;
 				delete tipos[j];
 			}
 		}
@@ -351,7 +351,7 @@ function printGastoD(){
 	for (j=1; j <= n; j++){
 		data = ordenado[j];
 		for (k in gastoD[data]){
-				print "<tr><td>" inverter(data) "</td><td>" k "</td><td>" gastoD[data][k] "€</td></tr>\n" > file;
+				printf ("<tr><td> %s </td><td> %s </td><td> %.2f€</td></tr>\n", inverter(data), k, gastoD[data][k]) > file;
 				delete gastoD[i][k];
 		}
 	}
@@ -369,7 +369,7 @@ function printDebitos(){
 	n = asorti(debitos, ordenado);
 	for (i=1; i <= n; i++){
 		dataDebito = ordenado[i];
-		print "<tr><td>" inverter(dataDebito) "</td><td>" debitos[dataDebito] "€</td></tr>\n" > file;
+		printf ("<tr><td> %s </td><td> %.2f€</td></tr>\n", inverter(dataDebito), debitos[dataDebito]) > file;
 	}
 	print "</table></div></div>" > file;
 	printFooter(file, 3); 
