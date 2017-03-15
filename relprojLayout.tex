@@ -232,7 +232,7 @@ A escolha do \textbf{RS} permite-nos encontrar, para cada transação, o valor do 
 \item Calcular o número de 'entradas' em cada dia do mês
 
 Para além do número de entradas, extendemos o âmbito da \textit{query} de modo a distinguir as entradas nos diferentes serviços - portagens ou parques de estacionamento.
-O objetivo da inversão da data é permitir, posteriormente, a ordenação.
+O objetivo da inversão da data é permitir, posteriormente, a ordenação. A função inverter usa a função split para dividir a data em dia, mês e ano, com o separador "-". 
 
 \begin{verbatim}
 NR > 1  {
@@ -250,15 +250,15 @@ Começou-se por separar os resultados por tipo. Em seguida, como se pretendia a i
 O resultado que é apresentado é a data original (é necessário inverter já que foi invertido anteriormente para se proceder à ordenação) e o número de entradas correspondente a essa data (este valor é obtido no array original, já que estes valores foram perdidos no array ordenado).
 
 \begin{verbatim}
-END   {
-    for (i in nEntradas){
-      print i;
-      n = asorti(nEntradas[i], ordenado);
-      for (j=1; j <= n; j++){
-        data = ordenado[j];
-        print inverter(data), nEntradas[i][data];
+END     {
+      for (i in nEntradas){
+        print i;
+        n = asorti(nEntradas[i], ordenado);
+        for (j=1; j <= n; j++){
+          data = ordenado[j];
+          print inverter(data), nEntradas[i][data];
+        }
       }
-    }
 }
 \end{verbatim}
 
@@ -279,6 +279,7 @@ NR > 1  {
 \end{verbatim}
 
 Uma vez que os dados são ordenados a partir do número de saídas, o processo para a apresentação dos resultados nesta \textit{query} é mais complexo, já que para cada número de saída é necessário descobrir no array original qual a saída correspondente. Quando essa saída é encontrada, esta é apagada do array para que, caso existam várias saídas com o mesmo número de ocorrências, estas não haja repetições nem omissões.
+Outro aspeto a considerar é que, já que se pretente apresentar os número de saída por ordem descendente, é necessário iterar do fim até ao início do array ordenado.
 
 \begin{verbatim}
 END     {
@@ -290,6 +291,33 @@ END     {
             if (saidas[i][k] == numeroSaidas){
               print k, numeroSaidas;
               delete saidas[i][k];
+            }
+          }
+        }
+      }
+}
+\end{verbatim}
+
+Nota: foi criada, adicionalmente, uma \textit{query} idêntica para os locais de entrada, sendo a única alteração o valor da tag pretendida para "ENTRADA". 
+
+\begin{verbatim}
+NR > 1  {
+      tipo = getValueOf("TIPO");
+      entrada = getValueOf("ENTRADA");
+      if (tipo != null && entrada != null){
+        entradas[tipo][entrada]++;
+      }
+}
+
+END     {
+      for (i in entradas){
+        n = asort(entradas[i], ordenado); 
+        for (j=n; j > 0; j--){
+          numeroEntradas = ordenado[j];
+          for (k in entradas[i]){
+            if (entradas[i][k] == numeroEntradas){
+              print k, numeroEntradas;
+              delete entradas[i][k];
             }
           }
         }
@@ -318,7 +346,33 @@ NR > 1  {
 }
 
 END     {
-      print "TOTAL", total;
+      printf ("TOTAL %.2f€", total);
+}
+\end{verbatim}
+
+Para além do total, foi também calculado o valor do iva e o total sem iva. Uma vez que o valor do iva de cada transação está em percentagem é necessário dividir o valor por 100, para poder efetuar os cálculos corretamente.
+
+\begin{verbatim}
+BEGIN   {
+      semIvaTotal = 0;
+      ivaTotal = 0;
+}
+
+NR > 1  {
+      imp = getValueOf("IMPORTANCIA");
+      desc = getValueOf("VALOR_DESCONTO");
+      ivaPerc = getValueOf("TAXA_IVA");
+      if (ivaPerc != null && imp != null && desc != null){
+        semIva = imp / (1 + ivaPerc/100) - desc;
+
+        semIvaTotal += semIva;
+        ivaTotal += semIva * (ivaPerc/100);
+      }
+}
+
+END     {
+      printf ("Total sem IVA %.2f€", semIvaTotal);
+      printf ("IVA %.2f€", ivaTotal);
 }
 \end{verbatim}
 
@@ -346,7 +400,7 @@ END     {
         valor = ordenado[i];
         for (j in tipos){
           if (tipos[j] == valor){
-            print j, valor;
+            printf (%s %.2f€", j, valor);
             delete tipos[j];
           }
         }
@@ -362,36 +416,50 @@ END     {
 
 \item Gasto diário nos vários tipos de serviço disponibilizados pela Via Verde
 
+Mais uma vez, inverte-se a data para permitir, posteriormente, a ordenação. Em cada transação calcula-se o valor gasto, somando-o ao gasto, para a data e tipo dessa transação, já calculado. 
+
 \begin{verbatim}
-if (tipo != null && data != null && data != "null"){
-  invData = inverter(data);
-  gastoD[invData][tipo] += imp - desc;
+NR > 1  {
+      tipo = getValueOf("TIPO");
+      data = getValueOf("DATA_ENTRADA");
+      if (tipo != null && data != null && data != "null"){
+        invData = inverter(data);
+        gastoD[invData][tipo] += imp - desc;
+      }
 }
 
-n = asorti(gastoD, ordenado);
-for (j=1; j <= n; j++){
-  data = ordenado[j];
-  for (k in gastoD[data]){
-    print inverter(data), k, gastoD[data][k];
-    delete gastoD[i][k];
-  }
+END     {
+      n = asorti(gastoD, ordenado);
+      for (j=1; j <= n; j++){
+        data = ordenado[j];
+        for (k in gastoD[data]){
+          printf ("%s %s %.2f€", inverter(data), k, gastoD[data][k]);
+          delete gastoD[i][k];
+        }
+      }
 }
 \end{verbatim}
 
 \item Débitos realizados por dia nos serviços Via Verde
 
+Tal como nas outras queries, para apresentar os resultados ordenados pela data é necessário invertê-la. Neste caso, as datas utilizadas são as datas referentes à tag DATA_DEBITO.
+
 \begin{verbatim}
-dataDebito = getValueOf("DATA_DEBITO");
-if (dataDebito != null && imp != null){
-  invData = inverter(dataDebito);
-  debitos[invData] += imp;
+NR > 1  {
+      dataDebito = getValueOf("DATA_DEBITO");
+      if (dataDebito != null && imp != null){
+        invData = inverter(dataDebito);
+        debitos[invData] += imp - desc;
+      }
 }
 
-n = asorti(debitos, ordenado);
-  for (i=1; i <= n; i++){
-    dataDebito = ordenado[i];
-    print inverter(dataDebito), debitos[dataDebito];
-  }
+END     {
+      n = asorti(debitos, ordenado);
+      for (i=1; i <= n; i++){
+        dataDebito = ordenado[i];
+        printf ("%s %.f€", inverter(dataDebito), debitos[dataDebito]);
+      }
+}
 \end{verbatim}
 
 \end{enumerate}
