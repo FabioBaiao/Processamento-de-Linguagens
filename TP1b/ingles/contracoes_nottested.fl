@@ -1,0 +1,22 @@
+%option noyywrap
+%%
+'m		printf(" am");
+'ll		printf(" will/shall");
+'re		printf(" are");
+can't	printf("can not");
+'s		printf(" is");
+n't 	printf(" not");
+gonna	printf("going to");
+'ve		printf(" have");
+gotta	printf("got to");
+'d		printf(" had/would");
+how'll	printf("how will");
+how's 	printf("how has/is/does");
+o'clock	printf("of the clock");
+ol'		printf("old");
+won't 	printf("will not");
+shan't 	printf("shall not");
+%%
+int main(){
+	yylex();
+}
