@@ -1,21 +1,21 @@
 %option noyywrap
 %%
-'m		printf(" am");
-'ll		printf(" will/shall");
-'re		printf(" are");
-can't	printf("can not");
-'s		printf(" is");
-n't 	printf(" not");
-gonna	printf("going to");
-'ve		printf(" have");
-gotta	printf("got to");
-'d		printf(" had/would");
-how'll	printf("how will");
-how's 	printf("how has/is/does");
-o'clock	printf("of the clock");
-ol'		printf("old");
-won't 	printf("will not");
-shan't 	printf("shall not");
+'m			printf(" am");
+'ll			printf(" will/shall");
+'re			printf(" are");
+[Cc]an't	printf("%can not", yytext[0]);
+'s			printf(" is");
+n't 		printf(" not");
+[Gg]onna	printf("%coing to", yytext[0]);
+'ve			printf(" have");
+[Gg]otta	printf("%cot to", yytext[0]);
+'d			printf(" had/would");
+[Hh]ow'll	printf("%cow will", yytext[0]);
+[Hh]ow's 	printf("%cow has/is/does", yytext[0]);
+[Oo]'clock	printf("%cf the clock", yytext[0]);
+ol'			printf("old");
+[Ww]on't 	printf("%cill not", yytext[0]);
+[Ss]han't 	printf("%chall not", yytext[0]);
 %%
 int main(){
 	yylex();
