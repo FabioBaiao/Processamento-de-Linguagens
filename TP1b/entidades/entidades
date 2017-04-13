@@ -1,9 +1,15 @@
 %option noyywrap
 %x CIDADE PAIS DATA PESSOA
 ELEMENT 	[a-zA-z ]+
+NUM 		[0-9]+
+%{
+	#include <glib.h>
 	int menor = -INF;
 	int maior = +INF;
-	
+	GPtrArray *cidades, paises, pessoas;
+	int nCidades = 0, nPaises = 0, nPessoas = 0; 
+%}
+
 %%
 
 <INITIAL>\<ENAMEX TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
@@ -14,15 +20,56 @@ ELEMENT 	[a-zA-z ]+
 <CIDADE, PAIS, PESSOA>\<\/ENAMEX\>		{BEGIN(INITIAL);}
 <DATE>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
-<CIDADE>{ELEMENT} 						{}			
-<PAIS>{ELEMENT} 						{}
-<DATA>{ELEMENT} 						{	int ano = atoi(yytext);
+<CIDADE>{ELEMENT} 						{	char *v = strdup(yytext);
+											g_ptr_array_add(cidades, v);
+											nCidades++;}
+<PAIS>{ELEMENT} 						{	char *v = strdup(yytext);
+											g_ptr_array_add(paises, v);
+											nPaises++;}
+<DATA>{NUM} 							{	int ano = atoi(yytext);
 											if (ano < menor) menor = ano;
 											else if (ano > maior) maior = ano;}
-<PESSOA>{ELEMENT} 						{}
+<PESSOA>{ELEMENT} 						{	char *v = strdup(yytext);
+											g_ptr_array_add(pessoas, v);
+											nPessoas++;}
 
 <*>.|\n 								{}
+
 %%
+
+void imprimeCidades(){
+	int i;
+	for (i = 0; i < nCidades; i++){
+		char *v = g_ptr_array_index(cidades, i);
+		printf("%s\n", v);
+	}
+}
+
+void imprimePaises(){
+	int i;
+	for (i = 0; i < nPaises; i++){
+		char *v = g_ptr_array_index(paises, i);
+		printf("%s\n", v);
+	}
+}
+
+void imprimePessoas(){
+	int i;
+	for (i = 0; i < nPessoas; i++){
+		char *v = g_ptr_array_index(pessoas, i);
+		printf("%s\n", v);
+	}
+}
+
 int main(){
+	cidades = g_ptr_array_new();
+	paises = g_ptr_array_new();
+	pessoas = g_ptr_array_new();
 	yylex();
+	g_ptr_array_sort(cidades, (GCompareFunc)strcmp);
+	g_ptr_array_sort(paises, (GCompareFunc)strcmp);
+	g_ptr_array_sort(pessoas, (GCompareFunc)strcmp);
+	imprimeCidades();
+	imprimePaises();
+	imprimePessoas();
 }
