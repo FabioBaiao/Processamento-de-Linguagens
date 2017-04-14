@@ -6,19 +6,19 @@ NUM 		[0-9]+
 	#include <glib.h>
 	int menor = -INF;
 	int maior = +INF;
-	GPtrArray *cidades, paises, pessoas;
+	GPtrArray *cidades, *paises, *pessoas;
 	int nCidades = 0, nPaises = 0, nPessoas = 0; 
 %}
 
 %%
 
-<INITIAL>\<ENAMEX TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
-<INITIAL>\<ENAMEX TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
-<INITIAL>\<ENAMEX TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
-<INITIAL>\<TIMEX TYPE=\"DATE\"\>		{BEGIN(DATE);}
+<INITIAL>\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
+<INITIAL>\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
+<INITIAL>\<ENAMEX\ TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
+<INITIAL>\<TIMEX\ TYPE=\"DATE\"\>		{BEGIN(DATA);}
 
-<CIDADE, PAIS, PESSOA>\<\/ENAMEX\>		{BEGIN(INITIAL);}
-<DATE>\<\/TIMEX\> 						{BEGIN(INITIAL);}
+<CIDADE,PAIS,PESSOA>\<\/ENAMEX\>		{BEGIN(INITIAL);}
+<DATA>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
 <CIDADE>{ELEMENT} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(cidades, v);
