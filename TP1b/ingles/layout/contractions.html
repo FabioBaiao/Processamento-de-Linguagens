@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<meta charset='UTF-8'/>
+		<link rel='stylesheet' type='text/css' href='styles.css'>
+	</head>
+	<body>
+		<div class='textbox'>
+			<h2 class='specialFont'>Remove contractions from:</h2>
+			<textarea id='textbox' class='text_area'>Insert your text here</textarea>
+		</div>
+		<div class='button_div'>
+			<button type='button' class='button' onclick="showResult()">Click to convert!</button>
+		</div>
+		<div id='conversion' class='result'>
+			<div class='output'>
+				<h2 class="specialFont">Done!</h2>
+				<a class='res_button' target='_blank' href="output.html">Show me the result text</a>
+			</div>
+			<div class='verbs'>
+				<h3 class="verbs_label">See also:</h3>
+				<a class='verbs_button' target='_blank' href='verbs.html'>Verbs used in the text</a>
+			</div>
+		</div>
+		<div class='footer'>
+			<div class='leftside_footer'>
+				<img class='image' src='image.png'/>
+				<div class='foot_label'>
+					<p>Lazy writing,</p>
+					<p>lazy conversion</p>
+				</div>
+			</div>
+			<div class='authors'>
+				<p>Fábio Baião</p>
+				<p>João Coelho</p>
+				<p>Luís Fernandes</p>
+			</div>
+
+		</div>
+		<script type="text/javascript" src='fileSaver.js'></script>
+		<script>		
+			function showResult() {
+				var text = document.getElementById('textbox').value;
+				var blob = new Blob([text], {type: "text/plain; charset=utf-8"});
+				saveAs(blob, "input.txt");
+   				document.getElementById('conversion').style.display = "block";
+			}
+		</script>
+	</body>
+</html>
+
+
+			
