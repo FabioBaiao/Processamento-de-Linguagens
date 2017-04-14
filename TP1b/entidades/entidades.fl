@@ -1,13 +1,16 @@
 %option noyywrap
 %x CIDADE PAIS DATA PESSOA
-ELEMENT 	[a-zA-z ]+
+LETRA 		[a-zA-Z\-.]
+PALAVRA 	{LETRA}+
+ELEMENTO 	{PALAVRA}(\ {PALAVRA})*
 NUM 		[0-9]+
 %{
 	#include <glib.h>
-	int menor = -INF;
-	int maior = +INF;
+	#include <math.h>
+	float menor = +INFINITY;
+	float maior = -INFINITY;
 	GPtrArray *cidades, *paises, *pessoas;
-	int nCidades = 0, nPaises = 0, nPessoas = 0; 
+	int nCidades = 0, nPaises = 0, nPessoas = 0;
 %}
 
 %%
@@ -20,16 +23,16 @@ NUM 		[0-9]+
 <CIDADE,PAIS,PESSOA>\<\/ENAMEX\>		{BEGIN(INITIAL);}
 <DATA>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
-<CIDADE>{ELEMENT} 						{	char *v = strdup(yytext);
+<CIDADE>{ELEMENTO} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(cidades, v);
 											nCidades++;}
-<PAIS>{ELEMENT} 						{	char *v = strdup(yytext);
+<PAIS>{ELEMENTO} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(paises, v);
 											nPaises++;}
 <DATA>{NUM} 							{	int ano = atoi(yytext);
 											if (ano < menor) menor = ano;
-											else if (ano > maior) maior = ano;}
-<PESSOA>{ELEMENT} 						{	char *v = strdup(yytext);
+											if (ano > maior) maior = ano;}
+<PESSOA>{ELEMENTO} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(pessoas, v);
 											nPessoas++;}
 
@@ -38,6 +41,7 @@ NUM 		[0-9]+
 %%
 
 void imprimeCidades(){
+	printf("CIDADES\n");
 	int i;
 	for (i = 0; i < nCidades; i++){
 		char *v = g_ptr_array_index(cidades, i);
@@ -46,6 +50,7 @@ void imprimeCidades(){
 }
 
 void imprimePaises(){
+	printf("PAISES\n");
 	int i;
 	for (i = 0; i < nPaises; i++){
 		char *v = g_ptr_array_index(paises, i);
@@ -54,6 +59,7 @@ void imprimePaises(){
 }
 
 void imprimePessoas(){
+	printf("PESSOAS\n");
 	int i;
 	for (i = 0; i < nPessoas; i++){
 		char *v = g_ptr_array_index(pessoas, i);
@@ -69,7 +75,7 @@ int main(){
 	g_ptr_array_sort(cidades, (GCompareFunc)strcmp);
 	g_ptr_array_sort(paises, (GCompareFunc)strcmp);
 	g_ptr_array_sort(pessoas, (GCompareFunc)strcmp);
-	imprimeCidades();
-	imprimePaises();
+	//imprimeCidades();
+	//imprimePaises();
 	imprimePessoas();
 }
