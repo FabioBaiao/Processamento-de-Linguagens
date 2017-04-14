@@ -1,0 +1,218 @@
+%
+% Layout retirado de http://www.di.uminho.pt/~prh/curplc09.html#notas
+%
+\documentclass{report}
+\usepackage[portuges]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage[latin1]{inputenc}
+
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{graphicx}
+
+%\usepackage{alltt}
+%\usepackage{fancyvrb}
+\usepackage{listings}
+%LISTING - GENERAL
+\lstset{
+	basicstyle=\small,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+    frame=tB,
+	mathescape=true,
+	escapeinside={(*@}{@*)}
+}
+%
+%\lstset{ %
+%	language=Java,							% choose the language of the code
+%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
+%	keywordstyle=\bfseries,					% set the keyword style
+%	%numbers=left,							% where to put the line-numbers
+%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
+%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
+%											% will be numbered
+%	numbersep=5pt,							% how far the line-numbers are from the code
+%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
+%	showspaces=false,						% show spaces adding particular underscores
+%	showstringspaces=false,					% underline spaces within strings
+%	showtabs=false,							% show tabs within strings adding particular underscores
+%	frame=none,								% adds a frame around the code
+%	%abovecaptionskip=-.8em,
+%	%belowcaptionskip=.7em,
+%	tabsize=2,								% sets default tabsize to 2 spaces
+%	captionpos=b,							% sets the caption-position to bottom
+%	breaklines=true,						% sets automatic line breaking
+%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
+%	title=\lstname,							% show the filename of files included with \lstinputlisting;
+%											% also try caption instead of title
+%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
+%	morekeywords={*,...}					% if you want to add more keywords to the set
+%}
+
+\usepackage{xspace}
+
+\parindent=0pt
+\parskip=2pt
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+\def\darius{\textsf{Darius}\xspace}
+\def\antlr{\texttt{AnTLR}\xspace}
+\def\pe{\emph{Publicação Eletrónica}\xspace}
+
+\def\titulo#1{\section{#1}}
+\def\super#1{{\em Supervisor: #1}\\ }
+\def\area#1{{\em \'{A}rea: #1}\\[0.2cm]}
+\def\resumo{\underline{Resumo}:\\ }
+
+
+%%%%\input{LPgeneralDefintions}
+
+\title{Processamento de Linguagens (3º Ano MIEI)\\ \textbf{Trabalho Prático 1b - FLEX}\\ Relatório de Desenvolvimento}
+\author{Fábio Luís Baião da Silva\\ (A75662) \and João da Cunha Coelho\\ (A74859) \and Luís Miguel Moreira Fernandes\\ (A74748) }
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Não sei o que escrever aqui!!!
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução} \label{intro}
+
+O primeiro contacto com o gerador Flex despertou grande curiosidade, uma vez que consiste em filtros a aplicar a textos que tornam o reconhecimento e análise mais fácil e intuitiva. O uso da linguagem C ao gerar filtros em Flex é, também, de grande utilidade, sendo que é uma linguagem já conhecida e trabalhada ao longo dos anos.
+
+Quanto ao tema, a escolha recaiu sobre o tema \textbf{2.4. Processador de Named Entities} devido à clareza do enunciado e das dificuldades que este nos poderia trazer e que gostaríamos de conseguir superar.
+
+\cleardoublepage
+
+\chapter{Estrutura do Ficheiro XML} \
+De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
+
+
+{\footnotesize
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+<ENAMEX> Vivia </ENAMEX> este herói no <ENAMEX TYPE="CITY"> Rio de
+Janeiro </ENAMEX>, <ENAMEX TYPE="COUNTRY">Brasil</ENAMEX> e era
+professor não se sabe de que doutrinas no ano de
+<TIMEX TYPE="DATE"> 1710 </TIMEX>, quando os franceses comandados por
+<ENAMEX TYPE="PERSON"> Duclerc </ENAMEX>, atacaram a cidade.
+O governador portou-se mal, e permanecia numa deplorável inacção, quando
+<ENAMEX TYPE="PERSON"> Bento do Amaral </ENAMEX> à frente dos seus
+estudantes e de paisanos armados, saiu a tomar o passo aos invasores,
+repelindo-os energicamente, e dando lugar a que o ataque se malograsse
+e os agressores ficassem prisioneiros.
+<ENAMEX> Não </ENAMEX> tardou <ENAMEX TYPE="PERSON"> Dugua-Trouin </ENAMEX>
+a vir tomar a desforra.
+</document>
+\end{verbatim}
+}
+
+\textbf{ENAMEX} e \textbf{TIMEX} são etiquetas que permitem identificar as entidades referidas num texto através de nomes próprios (do tipo: Pessoa, País, Cidade) ou Datas.
+
+
+
+\chapter{Apresentação da Solução} \label{ae}
+
+
+\section{Cenas}
+
+
+
+\section{Outras Cenas}
+
+
+
+\chapter{Apresentação das Queries e Resoluções}
+
+Neste capítulo serão explicadas as queries realizadas. Na primeira secção apresentar-se-á as queries obrigatórias sendo, de seguida, apresentadas as queries criadas adicionalmente pelo grupo.
+
+\section{Queries de Resolução Obrigatória}
+
+ 
+
+\bigskip
+
+\begin{enumerate}[a)]
+\item Produzir um índice em HTML com as Pessoas, Países e Cidades referidas.
+
+
+
+\bigskip
+
+\item Usar o Google Maps para localizar as cidades referidas.
+
+
+
+\end{enumerate}
+
+\section{Queries Adicionais}
+
+\begin{enumerate}[a)]
+
+\item Adicional 1
+
+
+
+\item Adicional 2
+
+
+
+\end{enumerate}
+
+
+\chapter{Apresentação de Resultados}
+
+Neste capítulo serão apresentados exemplos de utilização.
+
+\section{Execução}
+
+
+
+\section{Exemplos}
+
+Abrindo o menu principal aparece o seguinte resultado:
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Menu-Principal.png}
+%\caption{\label{fig:change}Menu Principal.}
+%\end{figure}
+
+Utilizando o menu de navegação superior para clicar em Cliente, obtem-se a página relativa aos dados do cliente. A partir do menu lateral, na secção de Consultas, é possível consultar as queries realizadas.
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Dados-Cliente.png}
+%\caption{\label{fig:change}Dados do Cliente.}
+%\end{figure}
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Numero-Entradas.png}
+%\caption{\label{fig:change}Número de entradas em cada dia.}
+%\end{figure}
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Locais-Entrada.png}
+%\caption{\label{fig:change}Locais de entrada e número de visitas.}
+%\end{figure}
+
+
+\chapter{Conclusão} \label{concl}
+
+
+
+\end{document} 
