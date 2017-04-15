@@ -40,6 +40,47 @@ n't 							{ fprintf(f, " not"); }
 .|\n							{ fprintf(f, "%s", yytext); }
 <*><<EOF>>						{ fprintf(f, "\t\t</textarea>\n\t"); 
 								  return 0;}
+[Tt]o\ my                       { fprintf(f, "%s", yytext); }
+[Tt]o\ your                     { fprintf(f, "%s", yytext); }
+[Tt]o\ his                      { fprintf(f, "%s", yytext); }
+[Tt]o\ her                      { fprintf(f, "%s", yytext); }
+[Tt]o\ its                      { fprintf(f, "%s", yytext); }
+[Tt]o\ our                      { fprintf(f, "%s", yytext); }
+[Tt]o\ their                    { fprintf(f, "%s", yytext); }
+[Tt]o\ the                      { fprintf(f, "%s", yytext); }
+[Tt]o\ a                        { fprintf(f, "%s", yytext); }
+[Tt]o\ an                       { fprintf(f, "%s", yytext); }
+[Tt]o\ all                      { fprintf(f, "%s", yytext); }
+[Tt]o\ many                     { fprintf(f, "%s", yytext); }
+[Tt]o\ [A-Z]                    { fprintf(f, "%s", yytext); }
+[Tt]o\ [0-9]+                   { fprintf(f, "%s", yytext); }
+[Tt]o\ one                      { fprintf(f, "%s", yytext); }
+[Tt]o\ two                      { fprintf(f, "%s", yytext); }
+[Tt]o\ three                    { fprintf(f, "%s", yytext); }
+[Tt]o\ four                     { fprintf(f, "%s", yytext); }
+[Tt]o\ five                     { fprintf(f, "%s", yytext); }
+[Tt]o\ six                      { fprintf(f, "%s", yytext); }
+[Tt]o\ seven                    { fprintf(f, "%s", yytext); }
+[Tt]o\ eight                    { fprintf(f, "%s", yytext); }
+[Tt]o\ nine                     { fprintf(f, "%s", yytext); }
+[Tt]o\ ten                      { fprintf(f, "%s", yytext); }
+[Tt]o\ eleven                   { fprintf(f, "%s", yytext); }
+[Tt]o\ twelve                   { fprintf(f, "%s", yytext); }
+[Tt]o\ thirteen                 { fprintf(f, "%s", yytext); }
+[Tt]o\ fourteen                 { fprintf(f, "%s", yytext); }
+[Tt]o\ fifteen                  { fprintf(f, "%s", yytext); }
+[Tt]o\ sixteen                  { fprintf(f, "%s", yytext); }
+[Tt]o\ seventeen                { fprintf(f, "%s", yytext); }
+[Tt]o\ eighteen                 { fprintf(f, "%s", yytext); }
+[Tt]o\ nineteen                 { fprintf(f, "%s", yytext); }
+[Tt]o\ twenty                   { fprintf(f, "%s", yytext); }
+[Tt]o\ thirty                   { fprintf(f, "%s", yytext); }
+[Tt]o\ forty                    { fprintf(f, "%s", yytext); }
+[Tt]o\ fifty                    { fprintf(f, "%s", yytext); }
+[Tt]o\ sixty                    { fprintf(f, "%s", yytext); }
+[Tt]o\ seventy                  { fprintf(f, "%s", yytext); }
+[Tt]o\ eighty                   { fprintf(f, "%s", yytext); }
+[Tt]o\ ninety                   { fprintf(f, "%s", yytext); }
 [Tt]o\ {ALPHA} 					{ fprintf(f, "%s", yytext);
 								  char *v = strdup(yytext+3);
 								  g_ptr_array_add(verbos, v);
