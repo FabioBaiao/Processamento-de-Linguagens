@@ -40,6 +40,12 @@ n't 							{ fprintf(f, " not"); }
 .|\n							{ fprintf(f, "%s", yytext); }
 <*><<EOF>>						{ fprintf(f, "\t\t</textarea>\n\t"); 
 								  return 0;}
+[Tt]o\ me                       { fprintf(f, "%s", yytext); }
+[Tt]o\ you                      { fprintf(f, "%s", yytext); }
+[Tt]o\ him                      { fprintf(f, "%s", yytext); }
+[Tt]o\ it                       { fprintf(f, "%s", yytext); }
+[Tt]o\ us                       { fprintf(f, "%s", yytext); }
+[Tt]o\ them                     { fprintf(f, "%s", yytext); }
 [Tt]o\ my                       { fprintf(f, "%s", yytext); }
 [Tt]o\ your                     { fprintf(f, "%s", yytext); }
 [Tt]o\ his                      { fprintf(f, "%s", yytext); }
@@ -47,6 +53,11 @@ n't 							{ fprintf(f, " not"); }
 [Tt]o\ its                      { fprintf(f, "%s", yytext); }
 [Tt]o\ our                      { fprintf(f, "%s", yytext); }
 [Tt]o\ their                    { fprintf(f, "%s", yytext); }
+[Tt]o\ mine                     { fprintf(f, "%s", yytext); }
+[Tt]o\ yours                    { fprintf(f, "%s", yytext); }
+[Tt]o\ hers                     { fprintf(f, "%s", yytext); }
+[Tt]o\ ours                     { fprintf(f, "%s", yytext); }
+[Tt]o\ theirs                   { fprintf(f, "%s", yytext); }
 [Tt]o\ the                      { fprintf(f, "%s", yytext); }
 [Tt]o\ a                        { fprintf(f, "%s", yytext); }
 [Tt]o\ an                       { fprintf(f, "%s", yytext); }
