@@ -96,8 +96,7 @@ Quanto ao tema, a escolha recaiu sobre o tema \textbf{2.4. Processador de Named 
 \cleardoublepage
 
 \chapter{Estrutura do Ficheiro XML} \
-De seguida é sucintamente explicada a estrutura do ficheiro XML em análise.\\
-
+De seguida, é sucintamente explicada a estrutura do dialeto XML chamado \textit{ENAMEX}, em análise neste trabalho.\\
 
 {\footnotesize
 \begin{verbatim}
@@ -119,16 +118,34 @@ a vir tomar a desforra.
 \end{verbatim}
 }
 
-\textbf{ENAMEX} e \textbf{TIMEX} são etiquetas que permitem identificar as entidades referidas num texto através de nomes próprios (do tipo: Pessoa, País, Cidade) ou Datas.
-
+As etiquetas \textit{ENAMEX} e \textit{TIMEX} permitem identificar, respetivamente, entidades representadas pelo nome próprio ou datas. Como podemos ter cidades, pessoas ou países representados pelo nome próprio, associa-se também um tipo à etiqueta.
 
 
 \chapter{Apresentação da Solução} \label{ae}
 
+\section{Análise do problema}
+Perante a necessidade de escrever um processador capaz de analisar um documento como o mencionado acima e produzir um índice HTML para cada um dos tipos da etiqueta \textit{ENAMEX}, começou-se por definir a estrutura usada para armazenar os nomes próprios de cada tipo, durante o processamento do ficheiro. A escolha recaiu pelo uso de arrays, um por tipo, particularmente os \textit{pointer arrays} da biblioteca \textbf{GLib}, por facilidade de utilização e por terem sido abordados em aulas práticas.
 
-\section{Cenas}
+\begin{verbatim}
+GPtrArray *cidades, *paises, *pessoas;
+\end{verbatim}
 
+Nota também para o uso de variáveis que contabilizam as ocorrências de cada um dos tipos \textit{ENAMEX}, auxiliares posteriormente na impressão dos índices HTML.\\
+Para determinar o maior e o menor ano mencionados no texto criaram-se duas variáveis, uma para cada ano, cujo valor será controlado por intermédio de comparações de valor, à medida que vamos percorrendo o ficheiro.
 
+\begin{verbatim}
+float menor = +INFINITY;
+float maior = -INFINITY;
+
+(...)
+
+<DATA>{NUM} 		{	int ano = atoi(yytext);
+						if (ano < menor) menor = ano;
+						if (ano > maior) maior = ano;	}
+\end{verbatim}
+
+}
+	
 
 \section{Outras Cenas}
 
