@@ -9,13 +9,24 @@ NUM 		[0-9]+
 	#include <math.h>
 	float menor = +INFINITY;
 	float maior = -INFINITY;
-	GPtrArray *cidades, *paises, *pessoas;
-	int nCidades = 0, nPaises = 0, nPessoas = 0;
+
+	GPtrArray *cidades, *paises, *pessoas, *datas;
+	int nCidades = 0, nPaises = 0, nPessoas = 0, nDatas = 0;
+	char* enc = "<meta charset='UTF-8'/>";
+	char* css = "<link rel='stylesheet' type='text/css' href='styles.css'>";
+	FILE *enam, *tim, *cid, *pais, *pess, *dat, *anos;
 %}
 
 %%
+	enam = fopen("layout/enamex.html", "w");
+	tim = fopen("layout/timex.html", "w");
+	cid = fopen("layout/cidades.html", "w");
+	pais = fopen("layout/paises.html", "w");
+	pess = fopen("layout/pessoas.html", "w");
+	anos = fopen("layout/anos.html", "w");
+	dat = fopen("layout/datas.html", "w");
 
-<INITIAL>\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
+<INITIAL>\<ENAMEX\ TYPE=\"LOCATION\"\> 		{BEGIN(CIDADE);}
 <INITIAL>\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
 <INITIAL>\<ENAMEX\ TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
 <INITIAL>\<TIMEX\ TYPE=\"DATE\"\>		{BEGIN(DATA);}
@@ -29,7 +40,10 @@ NUM 		[0-9]+
 <PAIS>{ELEMENTO} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(paises, v);
 											nPaises++;}
-<DATA>{NUM} 							{	int ano = atoi(yytext);
+<DATA>{NUM} 							{	char *v = strdup(yytext);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											int ano = atoi(yytext);
 											if (ano < menor) menor = ano;
 											if (ano > maior) maior = ano;}
 <PESSOA>{ELEMENTO} 						{	char *v = strdup(yytext);
@@ -40,42 +54,191 @@ NUM 		[0-9]+
 
 %%
 
-void imprimeCidades(){
-	printf("CIDADES\n");
+void beginTIMEX(FILE* f, char* act1, char* act2){
+	fprintf(f, "<html>\n");
+	fprintf(f, "\t<head>\n\t\t%s\n\t%s\n\t</head>\n", enc, css);
+	fprintf(f, "\t<body>");
+	fprintf(f, "\t\t<ul class='topmenu'>\n");
+	fprintf(f, "\t\t\t<li><a href='enamex.html'> ENAMEX </a></li>\n");
+	fprintf(f, "\t\t\t<li><a href='timex.html' class='active'> TIMEX </a></li>\n");
+	fprintf(f, "\t\t</ul>\n");
+	fprintf(f, "\t\t<div class='clearfix'>\n");
+	fprintf(f, "\t\t\t<div class='column sidemenu'>\n");
+	fprintf(f, "\t\t\t\t<ul>\n");
+	fprintf(f, "\t\t\t\t\t<li><a href='anos.html' %s> Cronologia </a></li>\n", act1);
+	fprintf(f, "\t\t\t\t\t<li><a href='datas.html' %s> Datas </a></li>\n", act2);
+	fprintf(f, "\t\t\t\t</ul>\t\t\t</div>\n");
+}
+
+void beginENAMEX(FILE* f, char* act1, char* act2, char* act3){
+	fprintf(f, "<html>\n");
+	fprintf(f, "\t<head>\n\t\t%s\n\t%s\n\t</head>\n", enc, css);
+	fprintf(f, "\t<body>");
+	fprintf(f, "\t\t<ul class='topmenu'>\n");
+	fprintf(f, "\t\t\t<li><a href='enamex.html' class='active'> ENAMEX </a></li>\n");
+	fprintf(f, "\t\t\t<li><a href='timex.html'> TIMEX </a></li>\n");
+	fprintf(f, "\t\t</ul>\n");
+	fprintf(f, "\t\t<div class='clearfix'>\n");
+	fprintf(f, "\t\t\t<div class='column sidemenu'>\n");
+	fprintf(f, "\t\t\t\t<ul>\n");
+	fprintf(f, "\t\t\t\t\t<li><a href='pessoas.html' %s> Pessoas </a></li>\n", act1);
+	fprintf(f, "\t\t\t\t\t<li><a href='paises.html' %s> Países </a></li>\n", act2);
+	fprintf(f, "\t\t\t\t\t<li><a href='cidades.html' %s> Cidades </a></li>\n", act3);
+	fprintf(f, "\t\t\t\t</ul>\t\t\t</div>\n");
+}
+
+void footerHTML(FILE *f) {
+	fprintf(f, "\t\t<div class='footer'>\n");
+	fprintf(f, "\t\t\t<div class='leftside_footer'>\n");
+	fprintf(f, "\t\t\t\t<img class='footer_img' src='image.png'/></a>\n");
+	fprintf(f, "\t\t\t\t<div class='foot_label'>\n");
+	fprintf(f, "\t\t\t\t\t<p style='color:#FF0'>Processador de</p>\n");
+	fprintf(f, "\t\t\t\t\t<p style='color: #FF0'>E N A M E X</p>\n");
+	fprintf(f, "\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t</div>\n");
+	fprintf(f, "\t\t\t<div class='authors'>\n");
+	fprintf(f, "\t\t\t\t<p>Fábio Baião</p>\n");
+	fprintf(f, "\t\t\t\t<p>João Coelho</p>\n");
+	fprintf(f, "\t\t\t\t<p>Luís Fernandes</p>\n");
+	fprintf(f, "\t\t\t</div>\n");
+	fprintf(f, "\t\t</div>\n");
+	fprintf(f, "\t</body>\n</html>");
+}
+
+void imprimeCidades(FILE *f, char* title){
+	fprintf(f, "\t\t\t\t<div class='column content'>\n");
+	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
+	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
+	fprintf(f, "\t\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t\t\t<table class='center'>\n");
+	fprintf(f, "\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Cidade</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
 	int i;
 	for (i = 0; i < nCidades; i++){
 		char *v = g_ptr_array_index(cidades, i);
-		printf("%s\n", v);
+		//int n = NR_OCORRENCIAS
+		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
+		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
 	}
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
+	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
 
-void imprimePaises(){
-	printf("PAISES\n");
+void imprimePaises(FILE *f, char* title){
+	fprintf(f, "\t\t\t\t<div class='column content'>\n");
+	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
+	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
+	fprintf(f, "\t\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t\t\t<table class='center'>\n");
+	fprintf(f, "\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>País</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
 	int i;
 	for (i = 0; i < nPaises; i++){
 		char *v = g_ptr_array_index(paises, i);
-		printf("%s\n", v);
+		//int n = NR_OCORRENCIAS
+		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
+		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
 	}
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
+	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
 
-void imprimePessoas(){
-	printf("PESSOAS\n");
+void imprimePessoas(FILE* f, char* title){
+	fprintf(f, "\t\t\t\t<div class='column content'>\n");
+	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
+	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
+	fprintf(f, "\t\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t\t\t<table class='center'>\n");
+	fprintf(f, "\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Pessoa</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
 	int i;
 	for (i = 0; i < nPessoas; i++){
 		char *v = g_ptr_array_index(pessoas, i);
-		printf("%s\n", v);
+		//int n = NR_OCORRENCIAS
+		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
+		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
 	}
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
+	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
 
-int main(){
+void imprimeAnos(FILE *f, char* title) {
+	fprintf(f, "\t\t\t\t<div class='column content'>\n");
+	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
+	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
+	fprintf(f, "\t\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t\t\t<table style='width: 40%' class='center'>\n");
+	fprintf(f, "\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%;'>Ano menor</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%;'>Ano mais atual</th>\n");
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", menor);
+	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", maior);
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
+	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
+}
+
+void imprimeDatas(FILE *f, char* title) {
+	fprintf(f, "\t\t\t\t<div class='column content'>\n");
+	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
+	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
+	fprintf(f, "\t\t\t\t\t</div>\n");
+	fprintf(f, "\t\t\t\t\t<table class='center'>\n");
+	fprintf(f, "\t\t\t\t\t\t<tr>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th>Data</th>\n");
+	int i;
+	for(i = 0; i < nDatas; i++) {
+		char *v = g_ptr_array_index(datas, i);
+		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
+	}
+	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
+	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
+}
+
+int main(int argc, char** argv){
+	if (argc == 2)
+		yyin = fopen(*(argv+1), "r");
 	cidades = g_ptr_array_new();
 	paises = g_ptr_array_new();
 	pessoas = g_ptr_array_new();
+	datas = g_ptr_array_new();
 	yylex();
 	g_ptr_array_sort(cidades, (GCompareFunc)strcmp);
 	g_ptr_array_sort(paises, (GCompareFunc)strcmp);
 	g_ptr_array_sort(pessoas, (GCompareFunc)strcmp);
-	//imprimeCidades();
-	//imprimePaises();
-	imprimePessoas();
+	beginENAMEX(enam,"","","");
+	footerHTML(enam);
+	fclose(enam);
+	beginTIMEX(tim,"","");
+	footerHTML(tim);
+	fclose(tim);
+	beginENAMEX(cid,"","","class='active'");
+	imprimeCidades(cid, "Nomes próprios relativos a cidades que constam do ficheiro XML analisado");
+	footerHTML(cid);
+	fclose(cid);
+	beginENAMEX(pais,"","class='active'","");
+	imprimeCidades(pais, "Nomes próprios relativos a países que constam do ficheiro XML analisado");
+	footerHTML(pais);
+	fclose(pais);
+	beginENAMEX(pess, "class='active'","","");
+	imprimePessoas(pess, "Nomes próprios relativos a pessoas que constam do ficheiro XML analisado");
+	footerHTML(pess);
+	fclose(pess);
+	beginTIMEX(dat,"","class='active'");
+	imprimeDatas(dat, "Datas mencionadas no ficheiro XML");
+	footerHTML(dat);
+	fclose(dat);
+	beginTIMEX(anos, "class='active'","");
+	imprimeAnos(anos, "Contexto cronológico do documento");
+	footerHTML(anos);
+	fclose(anos);
+	system("firefox layout/enamex.html");
+	return 0;
 }
