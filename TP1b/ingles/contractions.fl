@@ -12,7 +12,7 @@
 	FILE *fp, *f;
 %}
 ALPHA		[a-z]+
-EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many
+EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that
 NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety
 
 %%
@@ -57,6 +57,18 @@ n't 							{ fprintf(f, " not"); }
 								  char *v = strdup(yytext+3);
 								  g_ptr_array_add(verbos, v);
 								  n++; }
+
+[Bb][Tt][Ww]                    { fprintf(f, "%cy %che %cay", yytext[0], yytext[1], yytext[2]); }
+[Bb][Ff][Ff]                    { fprintf(f, "%cest %criend %corever", yytext[0], yytext[1], yytext[2]); }
+[Ii][Ll][Yy]                    { fprintf(f, "%c %cove %cou", yytext[0], yytext[1], yytext[2]); }
+[Ii][Dd][Gg][Aa][Ff]            { fprintf(f, "%c %con't %cive %c %cuck", yytext[0], yytext[1], yytext[2], yytext[3], yytext[4]); }
+[Jj][Kk]                        { fprintf(f, "%cust %cidding", yytext[0], yytext[1]); }
+[Ll][Mm][Aa][Oo]                { fprintf(f, "%caughing %cy %css %cff", yytext[0], yytext[1], yytext[2], yytext[3]); } 
+[Ll][Oo][Ll]                    { fprintf(f, "%caughing %cut %coud", yytext[0], yytext[1], yytext[2]); }
+[Nn][Pp]                        { fprintf(f, "%co %croblem", yytext[0], yytext[1]); }
+[Oo][Mm][Gg]                    { fprintf(f, "%ch %cy %cod", yytext[0], yytext[1], yytext[2]); }
+[Ww][Tt][Ff]                    { fprintf(f, "%chat %che %cuck", yytext[0], yytext[1], yytext[2]); }
+
 [Dd]o\ [Ii]\ {ALPHA}			{ fprintf(f, "%s", yytext);
 								  char* v = strdup(yytext+5); 
 								  g_ptr_array_add(verbos, v);
