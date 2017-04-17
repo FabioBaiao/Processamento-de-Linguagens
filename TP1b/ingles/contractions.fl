@@ -14,20 +14,20 @@
 ALPHA		[a-z]+
 EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many
 NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety
+
 %%
-	f = fopen("layout/output.html", "w");
-	fp = fopen("layout/verbs.html", "w");
-	htmlBegin(f, "Output text");
-	htmlBegin(fp, "Verbs used in the infinitive form");
-	fprintf(f, "\t\t<textarea class='output_box'>\n");
-	fprintf(fp, "\t\t<ul class='verbs_list'>\n");
+
+ain't 							{ fprintf(f, "am/is/are/has/have not"); }
+Ain't 							{ fprintf(f, "Am/Is/Are/Has/Have not"); }
+[Ss]han't 						{ fprintf(f, "%chall not", yytext[0]); }
+[Ww]on't 						{ fprintf(f, "%cill not", yytext[0]); }
+[Cc]an't						{ fprintf(f, "%cannot", yytext[0]); }
+n't 							{ fprintf(f, " not"); }
 
 'm								{ fprintf(f, " am"); }
 'll								{ fprintf(f, " will/shall"); }
 're								{ fprintf(f, " are"); }
-([Cc]an't)|([Cc]annot) 			{ fprintf(f, "%can not", yytext[0]); }
 's								{ fprintf(f, " is"); }
-n't 							{ fprintf(f, " not"); }
 [Gg]onna\ {ALPHA}				{ fprintf(f, "%coing to", yytext[0]);
 								  char *v = strdup(yytext+6);
 								  g_ptr_array_add(verbos, v);
@@ -43,8 +43,8 @@ n't 							{ fprintf(f, " not"); }
 [Hh]ow's 						{ fprintf(f, "%cow has/is", yytext[0]); }
 [Oo]'clock						{ fprintf(f, "%cf the clock", yytext[0]); }
 [Oo]l'							{ fprintf(f, "%cld", yytext[0]); }
-[Ww]on't 						{ fprintf(f, "%cill not", yytext[0]); }
-[Ss]han't 						{ fprintf(f, "%chall not", yytext[0]); }
+
+
 .|\n							{ fprintf(f, "%s", yytext); }
 <*><<EOF>>						{ fprintf(f, "\t\t</textarea>\n\t"); 
 								  return 0;}
@@ -98,7 +98,15 @@ n't 							{ fprintf(f, " not"); }
 								  g_ptr_array_add(verbos, v);
 								  n++; }
 %%
+
 int main(){
+	f = fopen("layout/output.html", "w");
+	fp = fopen("layout/verbs.html", "w");
+	htmlBegin(f, "Output text");
+	htmlBegin(fp, "Verbs used in the infinitive form");
+	fprintf(f, "\t\t<textarea class='output_box'>\n");
+	fprintf(fp, "\t\t<ul class='verbs_list'>\n");
+
 	system("mv ~/Downloads/input.txt .");
 	yyin = fopen("input.txt", "r");
 	verbos = g_ptr_array_new();
