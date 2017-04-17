@@ -11,7 +11,9 @@
 	int n = 0;
 	FILE *fp, *f;
 %}
-ALPHA	[a-zA-Z]+
+ALPHA		[a-z]+
+EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many
+NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety
 %%
 	f = fopen("layout/output.html", "w");
 	fp = fopen("layout/verbs.html", "w");
@@ -23,13 +25,19 @@ ALPHA	[a-zA-Z]+
 'm								{ fprintf(f, " am"); }
 'll								{ fprintf(f, " will/shall"); }
 're								{ fprintf(f, " are"); }
-[Cc]an't|[Cc]annot 				{ fprintf(f, "%can not", yytext[0]); }
+([Cc]an't)|([Cc]annot) 			{ fprintf(f, "%can not", yytext[0]); }
 's								{ fprintf(f, " is"); }
 n't 							{ fprintf(f, " not"); }
-[Gg]onna						{ fprintf(f, "%coing to", yytext[0]); }
+[Gg]onna\ {ALPHA}				{ fprintf(f, "%coing to", yytext[0]);
+								  char *v = strdup(yytext+6);
+								  g_ptr_array_add(verbos, v);
+								  n++; }
 [Cc]'mon						{ fprintf(f, "%come on", yytext[0]); }
 've								{ fprintf(f, " have"); }
-[Gg]otta						{ fprintf(f, "%cot to", yytext[0]); }
+[Gg]otta\ {ALPHA}				{ fprintf(f, "%cot to", yytext[0]);
+								  char *v = strdup(yytext+6);
+								  g_ptr_array_add(verbos, v);
+								  n++; }
 'd								{ fprintf(f, " had/would"); }
 [Hh]ow'll						{ fprintf(f, "%cow will", yytext[0]); }
 [Hh]ow's 						{ fprintf(f, "%cow has/is", yytext[0]); }
@@ -40,58 +48,11 @@ n't 							{ fprintf(f, " not"); }
 .|\n							{ fprintf(f, "%s", yytext); }
 <*><<EOF>>						{ fprintf(f, "\t\t</textarea>\n\t"); 
 								  return 0;}
-[Tt]o\ me                       { fprintf(f, "%s", yytext); }
-[Tt]o\ you                      { fprintf(f, "%s", yytext); }
-[Tt]o\ him                      { fprintf(f, "%s", yytext); }
-[Tt]o\ it                       { fprintf(f, "%s", yytext); }
-[Tt]o\ us                       { fprintf(f, "%s", yytext); }
-[Tt]o\ them                     { fprintf(f, "%s", yytext); }
-[Tt]o\ my                       { fprintf(f, "%s", yytext); }
-[Tt]o\ your                     { fprintf(f, "%s", yytext); }
-[Tt]o\ his                      { fprintf(f, "%s", yytext); }
-[Tt]o\ her                      { fprintf(f, "%s", yytext); }
-[Tt]o\ its                      { fprintf(f, "%s", yytext); }
-[Tt]o\ our                      { fprintf(f, "%s", yytext); }
-[Tt]o\ their                    { fprintf(f, "%s", yytext); }
-[Tt]o\ mine                     { fprintf(f, "%s", yytext); }
-[Tt]o\ yours                    { fprintf(f, "%s", yytext); }
-[Tt]o\ hers                     { fprintf(f, "%s", yytext); }
-[Tt]o\ ours                     { fprintf(f, "%s", yytext); }
-[Tt]o\ theirs                   { fprintf(f, "%s", yytext); }
-[Tt]o\ the                      { fprintf(f, "%s", yytext); }
-[Tt]o\ a                        { fprintf(f, "%s", yytext); }
-[Tt]o\ an                       { fprintf(f, "%s", yytext); }
-[Tt]o\ all                      { fprintf(f, "%s", yytext); }
-[Tt]o\ many                     { fprintf(f, "%s", yytext); }
+
+[Tt]o\ {EXCEPTIONS}				{ fprintf(f, "%s", yytext); }
 [Tt]o\ [A-Z]                    { fprintf(f, "%s", yytext); }
 [Tt]o\ [0-9]+                   { fprintf(f, "%s", yytext); }
-[Tt]o\ one                      { fprintf(f, "%s", yytext); }
-[Tt]o\ two                      { fprintf(f, "%s", yytext); }
-[Tt]o\ three                    { fprintf(f, "%s", yytext); }
-[Tt]o\ four                     { fprintf(f, "%s", yytext); }
-[Tt]o\ five                     { fprintf(f, "%s", yytext); }
-[Tt]o\ six                      { fprintf(f, "%s", yytext); }
-[Tt]o\ seven                    { fprintf(f, "%s", yytext); }
-[Tt]o\ eight                    { fprintf(f, "%s", yytext); }
-[Tt]o\ nine                     { fprintf(f, "%s", yytext); }
-[Tt]o\ ten                      { fprintf(f, "%s", yytext); }
-[Tt]o\ eleven                   { fprintf(f, "%s", yytext); }
-[Tt]o\ twelve                   { fprintf(f, "%s", yytext); }
-[Tt]o\ thirteen                 { fprintf(f, "%s", yytext); }
-[Tt]o\ fourteen                 { fprintf(f, "%s", yytext); }
-[Tt]o\ fifteen                  { fprintf(f, "%s", yytext); }
-[Tt]o\ sixteen                  { fprintf(f, "%s", yytext); }
-[Tt]o\ seventeen                { fprintf(f, "%s", yytext); }
-[Tt]o\ eighteen                 { fprintf(f, "%s", yytext); }
-[Tt]o\ nineteen                 { fprintf(f, "%s", yytext); }
-[Tt]o\ twenty                   { fprintf(f, "%s", yytext); }
-[Tt]o\ thirty                   { fprintf(f, "%s", yytext); }
-[Tt]o\ forty                    { fprintf(f, "%s", yytext); }
-[Tt]o\ fifty                    { fprintf(f, "%s", yytext); }
-[Tt]o\ sixty                    { fprintf(f, "%s", yytext); }
-[Tt]o\ seventy                  { fprintf(f, "%s", yytext); }
-[Tt]o\ eighty                   { fprintf(f, "%s", yytext); }
-[Tt]o\ ninety                   { fprintf(f, "%s", yytext); }
+[Tt]o\ {NUMBERS}				{ fprintf(f, "%s", yytext); }
 [Tt]o\ {ALPHA} 					{ fprintf(f, "%s", yytext);
 								  char *v = strdup(yytext+3);
 								  g_ptr_array_add(verbos, v);
@@ -124,11 +85,11 @@ n't 							{ fprintf(f, " not"); }
 								  char* v = strdup(yytext+6);
 								  g_ptr_array_add(verbos, v);
 								  n++; }
-[Dd]id\ he|we\ {ALPHA}			{ fprintf(f, "%s", yytext);
+[Dd]id\ (he|we)\ {ALPHA}			{ fprintf(f, "%s", yytext);
 								  char* v = strdup(yytext+7);
 								  g_ptr_array_add(verbos, v);
 								  n++; }
-[Dd]id\ she|you\ {ALPHA}		{ fprintf(f, "%s", yytext);
+[Dd]id\ (she|you)\ {ALPHA}	{ fprintf(f, "%s", yytext);
 								  char* v = strdup(yytext+8);
 								  g_ptr_array_add(verbos, v);
 								  n++; }
