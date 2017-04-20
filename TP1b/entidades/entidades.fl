@@ -2,7 +2,7 @@
 %x CIDADE PAIS DATA PESSOA
 LETRA 		[a-zA-Z\-.]
 PALAVRA 	{LETRA}+
-ELEMENTO 	{PALAVRA}(\ {PALAVRA})*
+ELEMENTO 	{PALAVRA}([ \n]{PALAVRA})*
 NUM 		[0-9]+
 %{
 	#include <glib.h>
@@ -26,7 +26,7 @@ NUM 		[0-9]+
 	anos = fopen("layout/anos.html", "w");
 	dat = fopen("layout/datas.html", "w");
 
-<INITIAL>\<ENAMEX\ TYPE=\"LOCATION\"\> 		{BEGIN(CIDADE);}
+<INITIAL>\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
 <INITIAL>\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
 <INITIAL>\<ENAMEX\ TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
 <INITIAL>\<TIMEX\ TYPE=\"DATE\"\>		{BEGIN(DATA);}
@@ -40,10 +40,28 @@ NUM 		[0-9]+
 <PAIS>{ELEMENTO} 						{	char *v = strdup(yytext);
 											g_ptr_array_add(paises, v);
 											nPaises++;}
-<DATA>{NUM} 							{	char *v = strdup(yytext);
+<DATA>({NUM}[ \n])?{ELEMENTO}			{	/*7 de Junho*/ /*Junho*/
+											char *v = strdup(yytext);
 											g_ptr_array_add(datas, v);
 											nDatas++;
-											int ano = atoi(yytext);
+											}
+<DATA>{NUM}\/{NUM}\/{NUM}				{	/*7/6/1996*/
+											char *v = strdup(yytext);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											char sep[2] = "/";
+											char *token = strtok(yytext, sep);
+											token = strtok(NULL, sep);
+											token = strtok(NULL, sep);
+											v = strdup(token);
+											float ano = atof(v);
+											if (ano < menor) menor = ano;
+											if (ano > maior) maior = ano;}
+<DATA>{NUM} 							{	/*1996*/
+											char *v = strdup(yytext);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											float ano = atof(yytext);
 											if (ano < menor) menor = ano;
 											if (ano > maior) maior = ano;}
 <PESSOA>{ELEMENTO} 						{	char *v = strdup(yytext);
@@ -173,13 +191,13 @@ void imprimeAnos(FILE *f, char* title) {
 	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
 	fprintf(f, "\t\t\t\t\t\t<h4 style='color:#008CBA;'>%s</h4>", title);
 	fprintf(f, "\t\t\t\t\t</div>\n");
-	fprintf(f, "\t\t\t\t\t<table style='width: 40%' class='center'>\n");
+	fprintf(f, "\t\t\t\t\t<table style='width: 40%%' class='center'>\n");
 	fprintf(f, "\t\t\t\t\t\t<tr>\n");
-	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%;'>Ano menor</th>\n");
-	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%;'>Ano mais atual</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%%;'>Ano menor</th>\n");
+	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%%;'>Ano mais atual</th>\n");
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
-	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", menor);
-	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", maior);
+	fprintf(f, "\t\t\t\t\t\t\t<td>%.0f</td>\n", menor);
+	fprintf(f, "\t\t\t\t\t\t\t<td>%.0f</td>\n", maior);
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
@@ -224,7 +242,7 @@ int main(int argc, char** argv){
 	footerHTML(cid);
 	fclose(cid);
 	beginENAMEX(pais,"","class='active'","");
-	imprimeCidades(pais, "Nomes próprios relativos a países que constam do ficheiro XML analisado");
+	imprimePaises(pais, "Nomes próprios relativos a países que constam do ficheiro XML analisado");
 	footerHTML(pais);
 	fclose(pais);
 	beginENAMEX(pess, "class='active'","","");
