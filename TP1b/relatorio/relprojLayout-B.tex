@@ -1,0 +1,300 @@
+%
+% Layout retirado de http://www.di.uminho.pt/~prh/curplc09.html#notas
+%
+\documentclass{report}
+\usepackage[portuges]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage[latin1]{inputenc}
+
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{graphicx}
+
+%\usepackage{alltt}
+%\usepackage{fancyvrb}
+\usepackage{listings}
+%LISTING - GENERAL
+\lstset{
+	basicstyle=\small,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	breaklines=true,
+    frame=tB,
+	mathescape=true,
+	escapeinside={(*@}{@*)}
+}
+%
+%\lstset{ %
+%	language=Java,							% choose the language of the code
+%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
+%	keywordstyle=\bfseries,					% set the keyword style
+%	%numbers=left,							% where to put the line-numbers
+%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
+%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
+%											% will be numbered
+%	numbersep=5pt,							% how far the line-numbers are from the code
+%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
+%	showspaces=false,						% show spaces adding particular underscores
+%	showstringspaces=false,					% underline spaces within strings
+%	showtabs=false,							% show tabs within strings adding particular underscores
+%	frame=none,								% adds a frame around the code
+%	%abovecaptionskip=-.8em,
+%	%belowcaptionskip=.7em,
+%	tabsize=2,								% sets default tabsize to 2 spaces
+%	captionpos=b,							% sets the caption-position to bottom
+%	breaklines=true,						% sets automatic line breaking
+%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
+%	title=\lstname,							% show the filename of files included with \lstinputlisting;
+%											% also try caption instead of title
+%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
+%	morekeywords={*,...}					% if you want to add more keywords to the set
+%}
+
+\usepackage{xspace}
+
+\parindent=0pt
+\parskip=2pt
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+\def\darius{\textsf{Darius}\xspace}
+\def\antlr{\texttt{AnTLR}\xspace}
+\def\pe{\emph{Publicação Eletrónica}\xspace}
+
+\def\titulo#1{\section{#1}}
+\def\super#1{{\em Supervisor: #1}\\ }
+\def\area#1{{\em \'{A}rea: #1}\\[0.2cm]}
+\def\resumo{\underline{Resumo}:\\ }
+
+
+%%%%\input{LPgeneralDefintions}
+
+\title{Processamento de Linguagens (3º Ano MIEI)\\ \textbf{Trabalho Prático 1b - FLEX}\\ Relatório de Desenvolvimento}
+\author{Fábio Luís Baião da Silva\\ (A75662) \and João da Cunha Coelho\\ (A74859) \and Luís Miguel Moreira Fernandes\\ (A74748) }
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Não sei o que escrever aqui!!!
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introdução} \label{intro}
+
+O primeiro contacto com o gerador Flex despertou grande curiosidade, uma vez que consiste em filtros a aplicar a textos que tornam o reconhecimento e análise mais fácil e intuitiva. O uso da linguagem C ao gerar filtros em Flex é, também, de grande utilidade, sendo que é uma linguagem já conhecida e trabalhada ao longo do curso.
+
+Quanto ao tema, a escolha recaiu sobre o tema \textbf{2.4. Processador de Named Entities}, devido à clareza do enunciado e à dimensão das dificuldades que este nos poderia trazer e que gostaríamos de conseguir superar, no entanto também desenvolvemos uma solução para o tema \textbf{2.1 Processador de Inglês Corrente}, que também merecerá uma secção própria neste relatório.
+
+\cleardoublepage
+
+\chapter{Processador de Named Entities} \
+
+\section{Estrutura do Ficheiro XML} \
+De seguida, é sucintamente explicada a estrutura do dialeto XML chamado \textit{ENAMEX}, em análise neste trabalho.\\
+
+{\footnotesize
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+<ENAMEX> Vivia </ENAMEX> este herói no <ENAMEX TYPE="CITY"> Rio de
+Janeiro </ENAMEX>, <ENAMEX TYPE="COUNTRY">Brasil</ENAMEX> e era
+professor não se sabe de que doutrinas no ano de
+<TIMEX TYPE="DATE"> 1710 </TIMEX>, quando os franceses comandados por
+<ENAMEX TYPE="PERSON"> Duclerc </ENAMEX>, atacaram a cidade.
+O governador portou-se mal, e permanecia numa deplorável inacção, quando
+<ENAMEX TYPE="PERSON"> Bento do Amaral </ENAMEX> à frente dos seus
+estudantes e de paisanos armados, saiu a tomar o passo aos invasores,
+repelindo-os energicamente, e dando lugar a que o ataque se malograsse
+e os agressores ficassem prisioneiros.
+<ENAMEX> Não </ENAMEX> tardou <ENAMEX TYPE="PERSON"> Dugua-Trouin </ENAMEX>
+a vir tomar a desforra.
+</document>
+\end{verbatim}
+}
+
+As etiquetas \textit{ENAMEX} e \textit{TIMEX} permitem identificar, respetivamente, entidades representadas pelo nome próprio ou datas. Como podemos ter cidades, pessoas ou países representados pelo nome próprio, associa-se também um tipo à etiqueta.
+
+
+\chapter{Apresentação da Solução} \label{ae}
+
+\section{Análise do problema}
+Perante a necessidade de escrever um processador capaz de analisar um documento como o mencionado acima e produzir um índice HTML para cada um dos tipos da etiqueta \textit{ENAMEX}, começou-se por definir a estrutura usada para armazenar os nomes próprios de cada tipo, durante o processamento do ficheiro. A escolha recaiu pelo uso de arrays, um por tipo, particularmente os \textit{pointer arrays} da biblioteca \textbf{GLib}, por facilidade de utilização e por terem sido abordados em aulas práticas.
+
+\begin{verbatim}
+GPtrArray *cidades, *paises, *pessoas;
+\end{verbatim}
+
+Nota também para o uso de variáveis que contabilizam as ocorrências de cada um dos tipos \textit{ENAMEX}, auxiliares posteriormente na impressão dos índices HTML.\\
+Para determinar o maior e o menor ano mencionados no texto criaram-se duas variáveis, uma para cada ano, cujo valor será controlado por intermédio de comparações de valor, à medida que vamos percorrendo o ficheiro.
+
+\begin{verbatim}
+float menor = +INFINITY;
+float maior = -INFINITY;
+
+(...)
+
+<DATA>{NUM} 		{	int ano = atoi(yytext);
+						if (ano < menor) menor = ano;
+						if (ano > maior) maior = ano;	}
+\end{verbatim}
+	
+
+\section{Outras Cenas}
+
+
+
+\chapter{Apresentação das Queries e Resoluções}
+
+Neste capítulo serão explicadas as queries realizadas. Na primeira secção apresentar-se-ão as queries obrigatórias sendo, de seguida, apresentadas as queries criadas adicionalmente pelo grupo.
+
+\section{Queries de Resolução Obrigatória}
+
+ 
+
+\bigskip
+
+\begin{enumerate}[a)]
+\item Produzir um índice em HTML com as Pessoas, Países e Cidades referidas.
+
+
+
+\bigskip
+
+\item Usar o Google Maps para localizar as cidades referidas.
+
+
+
+\end{enumerate}
+
+\section{Queries Adicionais}
+
+\begin{enumerate}[a)]
+
+\item Adicional 1
+
+
+
+\item Adicional 2
+
+
+
+\end{enumerate}
+
+
+\chapter{Apresentação de Resultados}
+
+Neste capítulo serão apresentados exemplos de utilização.
+
+\section{Execução}
+
+
+
+
+\section{Exemplos}
+
+Abrindo o menu principal aparece o seguinte resultado:
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Menu-Principal.png}
+%\caption{\label{fig:change}Menu Principal.}
+%\end{figure}
+
+Utilizando o menu de navegação superior para clicar em Cliente, obtem-se a página relativa aos dados do cliente. A partir do menu lateral, na secção de Consultas, é possível consultar as queries realizadas.
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Dados-Cliente.png}
+%\caption{\label{fig:change}Dados do Cliente.}
+%\end{figure}
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Numero-Entradas.png}
+%\caption{\label{fig:change}Número de entradas em cada dia.}
+%\end{figure}
+
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=120mm, scale=0.5]{Locais-Entrada.png}
+%\caption{\label{fig:change}Locais de entrada e número de visitas.}
+%\end{figure}
+
+
+\chapter{Processador de inglês corrente} \label{ingles}
+
+A primeira etapa da resolução deste problema foi tornar o filtro FLEX capaz de detetar as contrações de uso corrente e constante, tais como \textit{It's}, \textit{I'm}, \textit{You're}, entre outras. Sem a cobertura destes casos seria difícil considerar positiva a solução desenvolvida pelo grupo, mas com expressões como as que se podem ver na figura abaixo foi possível alcançar bons resultados.
+%imagem das contraçoes correntes
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{MostUsedContractions.png}
+\caption{\label{fig:change}Contrações mais recorrentes.}
+\end{figure}
+
+Há, porém, situações em que surge dúvida sobre a palavra contraída, uma vez que a contração pode representar dois vocábulos diferentes. Um exemplo é a contração \textit{'ll}, que pode comprimir tanto \textit{will} como \textit{shall}. Em abreviaturas dúbias como esta, optou-se por moldar o processador no sentido de substituir a contração pelas várias palavras que pode representar, separadas por /, cabendo depois ao utilizador fazer o seu juízo de valor e editar, se assim o preferir, a solução dada pelo programa, algo permitido pelo HTML no qual é exposto o texto de \textit{output}.
+%imagem dos will/shall
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{MultipleOption.png}
+\caption{\label{fig:change}Contrações com múltiplas opções.}
+\end{figure}
+
+Em seguida procurou-se a cobertura de contrações não tão frequentes, como \textit{gonna}, \textit{cannot} e outras sugeridas por uma breve pesquisa na web, e passou-se à segunda etapa da resolução do problema: a listagem dos verbos utilizados no infinitivo no texto ao qual se aplica o processador FLEX. A definição da estrutura onde seriam armazenados os verbos, ao longo do processamento da análise do ficheiro de \textit{input}, foi o primeiro passo. A escolha recaiu sobre as árvores da biblioteca GLib, ao contrário do que acontecera na resolução da solução para o problema dos processadores de Named Entities, porque pretendia-se evitar que um verbo fosse introduzido no array mais do que uma vez. Nota também para a contagem do número de verbos identificados, através de uma variável \textit{n}, para controlo do número de verbos repetidos encontrados e, assim, não introduzidos - a diferença entre n e o número de elementos na árvore resulta no número de verbos repetidos identificados pelo processador de texto.
+%imagem da estrutura
+\begin{figure}[h]
+\centering
+\includegraphics[width=30mm, scale=0.5]{tree+n.png}
+\caption{\label{fig:change}Estrutura usada e variável auxiliar.}
+\end{figure}
+
+\newpage
+Chegou, então, a altura de pensar em que situações se usam verbos no infinitivo. Tal como consta no enunciado, os casos mais óbvios serão aqueles em que o verbo é usado com \textit{to} atrás ou quando surgem associados a palavras como \textit{do} ou \textit{did}, porém existem outras situações que o grupo procurou cobrir - a seguir a contrações como \textit{gonna} e \textit{wanna} ou a seguir a frases interrogativas com verbos modais (\textit{should}, \textit{may}, \textit{must}, etc.), por exemplo, a frase requer um verbo no infinitivo.
+%imagem das questoes
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{questions+pronouns.png}
+\caption{\label{fig:change}Cobertura de verbos nas questões.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{questionsUse.png}
+\caption{\label{fig:change}Inclusão dos verbos, usando as definições acima.}
+\end{figure}
+
+Nesta questão dos verbos há novamente um senão. Começando pelo facto de a palavra \textit{to} não ser usada apenas como antecessor de verbos, mas também como preposição, cria logo a necessidade de excluir diversos casos. Uma frase exemplo: \textit{I want to give a present to Anthony's brother.} - nesta frase temos dois \textit{to}, um que precede o verbo \textit{want} e outro que precede um complemento indireto. Apesar de ser díficil cobrir todas as situações, através da representação das exceções (Fig. 6.6) e das situações em que se segue letra maiúscula, números ou sinais de pontuação a um \textit{to}, consegue-se que a maioria dos \textit{to} seja corretamente identificada como verbo ou preposição.
+%imagem dos casos excluídos
+\begin{figure}[h]
+\centering
+\includegraphics[width=130mm, scale=0.5]{exceptions.png}
+\caption{\label{fig:change}Algumas palavras que, não sendo verbos, podem suceder a um \textit{to}.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{falseTos.png}
+\caption{\label{fig:change}Casos em que o \textit{to} não antecede um verbo.}
+\end{figure}
+
+\newpage
+Por fim, para aumentar a área de atuação do processador FLEX, decidiu-se colocar algumas abreviaturas, para além de contrações, no lote de expressões regulares filtradas.
+%imagem das abreviaturas
+\begin{figure}[h]
+\centering
+\includegraphics[width=150mm, scale=0.5]{abreviations.png}
+\caption{\label{fig:change}Abreviaturas incluídas.}
+\end{figure}
+
+\chapter{Conclusão} \label{concl}
+
+
+
+\end{document} 
