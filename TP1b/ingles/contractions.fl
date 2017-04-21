@@ -5,6 +5,7 @@
 
 	void htmlBegin(FILE* f, char* title);
 	void htmlEnd(FILE* f);
+	void insert(GTree *, char *);
 	gboolean printVerb(gpointer key, gpointer value, gpointer data);
 
 	GTree *verbs;
@@ -12,12 +13,12 @@
 	FILE *fp, *f;
 %}
 QUESTIONS	[Dd]o|[Dd]oes|[Dd]id|[Ss]hall|[Ss]hould|[Mm]ay|[Mm]ight|[Cc]an|[Cc]ould|[Ww]ill|[Ww]ould|[Oo]ught|[Mm]ust
-NEGATIVE	[Dd]on't|[Dd]oesn't|[Dd]idn't|[Ss]houldn't|[Mm]ightn't|[Cc]an't|[Cc]ouldn't|[Ww]on't|[Mm]ustn't|[Ww]ouldn't
-PRONOUNS	[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey
+NEGATIVE	[Dd]on't|[Dd]oesn't|[Dd]idn't|[Ss]houldn't|[Mm]ightn't|[Cc]ouldn't|[Mm]ustn't|[Ww]ouldn't
+SUBJECT		[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey|[A-Z]{1}[a-z]+
 ALPHA		[a-z]+
 SIGNAL		[,;:.-?!\n\t]
 EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that
-NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety
+NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety	
 
 %%
 
@@ -32,15 +33,19 @@ n't 									{ fprintf(f, " not"); }
 'll										{ fprintf(f, " will/shall"); }
 're										{ fprintf(f, " are"); }
 's										{ fprintf(f, " is"); }
-[Gg]onna\ {ALPHA}						{ fprintf(f, "%coing to", yytext[0]);
+[Gg]onna\ {ALPHA}						{ fprintf(f, "%coing to %s", yytext[0], yytext+6);
 								  		  char *v = strdup(yytext+6);
-								    	  g_tree_insert(verbs, v, NULL);
+								    	  insert(verbs, v);
+								  		  n++; }
+[Ww]anna\ {ALPHA}						{ fprintf(f, "%cant to %s", yytext[0], yytext+6);
+								  		  char *v = strdup(yytext+6);
+								    	  insert(verbs, v);
 								  		  n++; }
 [Cc]'mon								{ fprintf(f, "%come on", yytext[0]); }
 've										{ fprintf(f, " have"); }
-[Gg]otta\ {ALPHA}						{ fprintf(f, "%cot to", yytext[0]);
+[Gg]otta\ {ALPHA}						{ fprintf(f, "%cot to %s", yytext[0], yytext+6);
 										  char *v = strdup(yytext+6);
-										  g_tree_insert(verbs, v, NULL);
+										  insert(verbs, v);
 										  n++; }
 'd										{ fprintf(f, " had/would"); }
 [Hh]ow'll								{ fprintf(f, "%cow will", yytext[0]); }
@@ -60,7 +65,7 @@ n't 									{ fprintf(f, " not"); }
 [Tt]o\ {SIGNAL}							{ fprintf(f, "%s", yytext); }
 [Tt]o\ {ALPHA} 							{ fprintf(f, "%s", yytext);
 								  	      char *v = strdup(yytext+3);
-								  		  g_tree_insert(verbs, v, NULL);
+								  		  insert(verbs, v);
 								  		  n++; }
 
 [Bb][Tt][Ww]                    		{ fprintf(f, "%cy %che %cay", yytext[0], yytext[1], yytext[2]); }
@@ -74,21 +79,33 @@ n't 									{ fprintf(f, " not"); }
 [Oo][Mm][Gg]                    		{ fprintf(f, "%ch %cy %cod", yytext[0], yytext[1], yytext[2]); }
 [Ww][Tt][Ff]                    		{ fprintf(f, "%chat %che %cuck", yytext[0], yytext[1], yytext[2]); }
 
-{QUESTIONS}\ {PRONOUNS}\ {ALPHA}		{ fprintf(f, "%s", yytext);
+{QUESTIONS}\ {SUBJECT}\ {ALPHA} 		{ fprintf(f, "%s", yytext);
 										  strtok(yytext, " ");
 										  strtok(NULL, " ");
-								  		  char* v = strdup(strtok(NULL," ")); 
-								  		  g_tree_insert(verbs, v, NULL);
-								  		  n++; }
-{NEGATIVE}\ {PRONOUNS}\ {ALPHA}			{ char* rep = strdup(yytext);
+									  	  char* v = strdup(strtok(NULL," ")); 
+									  	  insert(verbs, v);
+									  	  n++; }
+[Cc]an't\ {SUBJECT}\ {ALPHA}			{ strtok(yytext, " ");
+										  char* subject = strtok(NULL, " ");
+										  char* v = strdup(strtok(NULL, " "));
+										  fprintf(f, "%cannot %s %s", yytext[0], subject, v);
+										  insert(verbs, v);
+										  n++;  }								  		  
+[Ww]on't\ {SUBJECT}\ {ALPHA}			{ strtok(yytext, " ");
+										  char* subject = strtok(NULL, " ");
+										  char* v = strtok(NULL, " ");
+										  fprintf(f, "%cill not %s %s", yytext[0], subject, v);
+										  insert(verbs, v);
+										  n++;  }
+{NEGATIVE}\ {SUBJECT}\ {ALPHA}			{ char* rep = strdup(yytext);
 										  char* neg = strtok(yytext, "n't");
 										  strtok(rep, " ");
-										  char* pronoun = strtok(NULL, " ");
+										  char* subject = strtok(NULL, " ");
 										  char* v = strtok(NULL, " ");
-										  fprintf(f, "%s not %s %s", neg, pronoun, v);
-										  g_tree_insert(verbs, v, NULL);
+										  fprintf(f, "%s not %s %s", neg, subject, v);
+										  insert(verbs, v);
 										  n++;
-								  		  free(rep); }
+									  	  free(rep); }
 
 %%
 
@@ -132,6 +149,18 @@ void htmlEnd(FILE* f){
 }
 
 gboolean printVerb(gpointer key, gpointer value, gpointer data) {
-	fprintf(fp, "\t\t\t<li>%s</li>\n", (char *) key);	
+	fprintf(fp, "\t\t\t<li>%s ...... x%d</li>\n", (char *) key, *((int *) value));	
 	return FALSE;
+}
+
+void insert(GTree *tree, char *key){
+	int *value = g_tree_lookup(tree, key);
+	if (value != NULL){
+		(*value)++;
+	}
+	else{
+		value = malloc(sizeof(int));
+		*value = 1;
+	}
+	g_tree_insert(tree, key, value);
 }
