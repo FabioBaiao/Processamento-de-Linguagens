@@ -7,10 +7,15 @@ NUM 		[0-9]+
 %{
 	#include <glib.h>
 	#include <math.h>
-	float menor = +INFINITY;
-	float maior = -INFINITY;
 
-	GPtrArray *cidades, *paises, *pessoas, *datas;
+	void setLimites(int);
+	void inserir(GTree *, char *);
+
+	int menor = 0;
+	int maior = 0;
+
+	GPtrArray *datas;
+	GTree *cidades, *paises, *pessoas;
 	int nCidades = 0, nPaises = 0, nPessoas = 0, nDatas = 0;
 	char* enc = "<meta charset='UTF-8'/>";
 	char* css = "<link rel='stylesheet' type='text/css' href='styles.css'>";
@@ -18,13 +23,6 @@ NUM 		[0-9]+
 %}
 
 %%
-	enam = fopen("layout/enamex.html", "w");
-	tim = fopen("layout/timex.html", "w");
-	cid = fopen("layout/cidades.html", "w");
-	pais = fopen("layout/paises.html", "w");
-	pess = fopen("layout/pessoas.html", "w");
-	anos = fopen("layout/anos.html", "w");
-	dat = fopen("layout/datas.html", "w");
 
 <INITIAL>\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
 <INITIAL>\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
@@ -34,12 +32,11 @@ NUM 		[0-9]+
 <CIDADE,PAIS,PESSOA>\<\/ENAMEX\>		{BEGIN(INITIAL);}
 <DATA>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
-<CIDADE>{ELEMENTO} 						{	char *v = strdup(yytext);
-											g_ptr_array_add(cidades, v);
-											nCidades++;}
-<PAIS>{ELEMENTO} 						{	char *v = strdup(yytext);
-											g_ptr_array_add(paises, v);
-											nPaises++;}
+<CIDADE>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											inserir(cidades, chave);}
+<PAIS>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											inserir(paises, chave);}
+
 <DATA>({NUM}[ \n])?{ELEMENTO}			{	/*7 de Junho*/ /*Junho*/
 											char *v = strdup(yytext);
 											g_ptr_array_add(datas, v);
@@ -54,23 +51,38 @@ NUM 		[0-9]+
 											token = strtok(NULL, sep);
 											token = strtok(NULL, sep);
 											v = strdup(token);
-											float ano = atof(v);
-											if (ano < menor) menor = ano;
-											if (ano > maior) maior = ano;}
+											int ano = atoi(v);
+											setLimites(ano);}
 <DATA>{NUM} 							{	/*1996*/
 											char *v = strdup(yytext);
 											g_ptr_array_add(datas, v);
 											nDatas++;
-											float ano = atof(yytext);
-											if (ano < menor) menor = ano;
-											if (ano > maior) maior = ano;}
-<PESSOA>{ELEMENTO} 						{	char *v = strdup(yytext);
-											g_ptr_array_add(pessoas, v);
-											nPessoas++;}
+											int ano = atoi(yytext);
+											setLimites(ano);}
+
+<PESSOA>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											inserir(pessoas, chave);}
 
 <*>.|\n 								{}
 
 %%
+
+void setLimites(int ano){
+	if (ano < menor || menor == 0) menor = ano;
+	if (ano > maior || maior == 0) maior = ano;
+}
+
+void inserir(GTree *arvore, char *chave){
+	int *valor = g_tree_lookup(arvore, chave);
+	if (valor != NULL){
+		(*valor)++;
+	}
+	else{
+		valor = malloc(sizeof(int));
+		*valor = 1;
+	}
+	g_tree_insert(arvore, chave, valor);
+}
 
 void beginTIMEX(FILE* f, char* act1, char* act2){
 	fprintf(f, "<html>\n");
@@ -123,6 +135,13 @@ void footerHTML(FILE *f) {
 	fprintf(f, "\t</body>\n</html>");
 }
 
+gboolean printNodo(gpointer key, gpointer value, gpointer data) {
+	fprintf(data, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+	fprintf(data, "\t\t\t\t\t\t\t<td>%s</td>\n", (char *) key);
+	fprintf(data, "\t\t\t\t\t\t\t<td>%d</td>\n", *((int *) value));
+	return FALSE;
+}
+
 void imprimeCidades(FILE *f, char* title){
 	fprintf(f, "\t\t\t\t<div class='column content'>\n");
 	fprintf(f, "\t\t\t\t\t<div class='header'>\n");
@@ -132,14 +151,9 @@ void imprimeCidades(FILE *f, char* title){
 	fprintf(f, "\t\t\t\t\t\t<tr>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Cidade</th>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
-	int i;
-	for (i = 0; i < nCidades; i++){
-		char *v = g_ptr_array_index(cidades, i);
-		//int n = NR_OCORRENCIAS
-		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
-		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
-		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
-	}
+	
+	g_tree_foreach(cidades, (GTraverseFunc)printNodo, f);
+
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
@@ -153,14 +167,9 @@ void imprimePaises(FILE *f, char* title){
 	fprintf(f, "\t\t\t\t\t\t<tr>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>País</th>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
-	int i;
-	for (i = 0; i < nPaises; i++){
-		char *v = g_ptr_array_index(paises, i);
-		//int n = NR_OCORRENCIAS
-		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
-		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
-		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
-	}
+	
+	g_tree_foreach(paises, (GTraverseFunc)printNodo, f);
+	
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
@@ -174,14 +183,9 @@ void imprimePessoas(FILE* f, char* title){
 	fprintf(f, "\t\t\t\t\t\t<tr>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Pessoa</th>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
-	int i;
-	for (i = 0; i < nPessoas; i++){
-		char *v = g_ptr_array_index(pessoas, i);
-		//int n = NR_OCORRENCIAS
-		fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
-		fprintf(f, "\t\t\t\t\t\t\t<td>%s</td>\n", v);	
-		fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", 1); //1 deveria ser n
-	}
+	
+	g_tree_foreach(pessoas, (GTraverseFunc)printNodo, f);
+
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
@@ -196,8 +200,8 @@ void imprimeAnos(FILE *f, char* title) {
 	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%%;'>Ano menor</th>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th style='width: 50%%;'>Ano mais atual</th>\n");
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
-	fprintf(f, "\t\t\t\t\t\t\t<td>%.0f</td>\n", menor);
-	fprintf(f, "\t\t\t\t\t\t\t<td>%.0f</td>\n", maior);
+	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", menor);
+	fprintf(f, "\t\t\t\t\t\t\t<td>%d</td>\n", maior);
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
 }
@@ -221,16 +225,20 @@ void imprimeDatas(FILE *f, char* title) {
 }
 
 int main(int argc, char** argv){
+	enam = fopen("layout/enamex.html", "w");
+	tim = fopen("layout/timex.html", "w");
+	cid = fopen("layout/cidades.html", "w");
+	pais = fopen("layout/paises.html", "w");
+	pess = fopen("layout/pessoas.html", "w");
+	anos = fopen("layout/anos.html", "w");
+	dat = fopen("layout/datas.html", "w");
 	if (argc == 2)
 		yyin = fopen(*(argv+1), "r");
-	cidades = g_ptr_array_new();
-	paises = g_ptr_array_new();
-	pessoas = g_ptr_array_new();
+	cidades = g_tree_new((GCompareFunc)strcmp);
+	paises = g_tree_new((GCompareFunc)strcmp);
+	pessoas = g_tree_new((GCompareFunc)strcmp);
 	datas = g_ptr_array_new();
 	yylex();
-	g_ptr_array_sort(cidades, (GCompareFunc)strcmp);
-	g_ptr_array_sort(paises, (GCompareFunc)strcmp);
-	g_ptr_array_sort(pessoas, (GCompareFunc)strcmp);
 	beginENAMEX(enam,"","","");
 	footerHTML(enam);
 	fclose(enam);
