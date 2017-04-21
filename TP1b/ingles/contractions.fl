@@ -11,7 +11,8 @@
 	int n = 0;
 	FILE *fp, *f;
 %}
-QUESTIONS	[Dd]o(n't)?|[Dd]oes(n't)?|[Dd]id(n't)?|[Ss]hall|[Ss]ould(n't)?|[Mm]ay|[Mm]ight(n't)?|[Cc]an('t)?|[Cc]ould(n't)?|[Ww]ill|[Ww]on't|[Ww]ould(n't)?|[Oo]ught|[Mm]ust(n't)?
+QUESTIONS	[Dd]o|[Dd]oes|[Dd]id|[Ss]hall|[Ss]hould|[Mm]ay|[Mm]ight|[Cc]an|[Cc]ould|[Ww]ill|[Ww]ould|[Oo]ught|[Mm]ust
+NEGATIVE	[Dd]on't|[Dd]oesn't|[Dd]idn't|[Ss]houldn't|[Mm]ightn't|[Cc]an't|[Cc]ouldn't|[Ww]on't|[Mm]ustn't|[Ww]ouldn't
 PRONOUNS	[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey
 ALPHA		[a-z]+
 SIGNAL		[,;:.-?!\n\t]
@@ -79,6 +80,16 @@ n't 									{ fprintf(f, " not"); }
 								  		  char* v = strdup(strtok(NULL," ")); 
 								  		  g_tree_insert(verbs, v, NULL);
 								  		  n++; }
+{NEGATIVE}\ {PRONOUNS}\ {ALPHA}			{ char* rep = strdup(yytext);
+										  char* neg = strtok(yytext, "n't");
+										  strtok(rep, " ");
+										  char* pronoun = strtok(NULL, " ");
+										  char* v = strtok(NULL, " ");
+										  fprintf(f, "%s not %s %s", neg, pronoun, v);
+										  g_tree_insert(verbs, v, NULL);
+										  n++;
+								  		  free(rep); }
+
 %%
 
 int main(){
