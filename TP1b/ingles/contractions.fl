@@ -5,110 +5,80 @@
 
 	void htmlBegin(FILE* f, char* title);
 	void htmlEnd(FILE* f);
-	void imprimeVerbos(FILE* f);
+	gboolean printVerb(gpointer key, gpointer value, gpointer data);
 
-	GPtrArray *verbos;
+	GTree *verbs;
 	int n = 0;
 	FILE *fp, *f;
 %}
+QUESTIONS	[Dd]o(n't)?|[Dd]oes(n't)?|[Dd]id(n't)?|[Ss]hall|[Ss]ould(n't)?|[Mm]ay|[Mm]ight(n't)?|[Cc]an('t)?|[Cc]ould(n't)?|[Ww]ill|[Ww]on't|[Ww]ould(n't)?|[Oo]ught|[Mm]ust(n't)?
+PRONOUNS	[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey
 ALPHA		[a-z]+
+SIGNAL		[,;:.-?!\n\t]
 EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that
 NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety
 
 %%
 
-ain't 							{ fprintf(f, "am/is/are/has/have not"); }
-Ain't 							{ fprintf(f, "Am/Is/Are/Has/Have not"); }
-[Ss]han't 						{ fprintf(f, "%chall not", yytext[0]); }
-[Ww]on't 						{ fprintf(f, "%cill not", yytext[0]); }
-[Cc]an't						{ fprintf(f, "%cannot", yytext[0]); }
-n't 							{ fprintf(f, " not"); }
+ain't 									{ fprintf(f, "am/is/are/has/have not"); }
+Ain't 									{ fprintf(f, "Am/Is/Are/Has/Have not"); }
+[Ss]han't 								{ fprintf(f, "%chall not", yytext[0]); }
+[Ww]on't 								{ fprintf(f, "%cill not", yytext[0]); }
+[Cc]an't								{ fprintf(f, "%cannot", yytext[0]); }
+n't 									{ fprintf(f, " not"); }
 
-'m								{ fprintf(f, " am"); }
-'ll								{ fprintf(f, " will/shall"); }
-'re								{ fprintf(f, " are"); }
-'s								{ fprintf(f, " is"); }
-[Gg]onna\ {ALPHA}				{ fprintf(f, "%coing to", yytext[0]);
-								  char *v = strdup(yytext+6);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Cc]'mon						{ fprintf(f, "%come on", yytext[0]); }
-'ve								{ fprintf(f, " have"); }
-[Gg]otta\ {ALPHA}				{ fprintf(f, "%cot to", yytext[0]);
-								  char *v = strdup(yytext+6);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-'d								{ fprintf(f, " had/would"); }
-[Hh]ow'll						{ fprintf(f, "%cow will", yytext[0]); }
-[Hh]ow's 						{ fprintf(f, "%cow has/is", yytext[0]); }
-[Oo]'clock						{ fprintf(f, "%cf the clock", yytext[0]); }
-[Oo]l'							{ fprintf(f, "%cld", yytext[0]); }
+'m										{ fprintf(f, " am"); }
+'ll										{ fprintf(f, " will/shall"); }
+'re										{ fprintf(f, " are"); }
+'s										{ fprintf(f, " is"); }
+[Gg]onna\ {ALPHA}						{ fprintf(f, "%coing to", yytext[0]);
+								  		  char *v = strdup(yytext+6);
+								    	  g_tree_insert(verbs, v, NULL);
+								  		  n++; }
+[Cc]'mon								{ fprintf(f, "%come on", yytext[0]); }
+'ve										{ fprintf(f, " have"); }
+[Gg]otta\ {ALPHA}						{ fprintf(f, "%cot to", yytext[0]);
+										  char *v = strdup(yytext+6);
+										  g_tree_insert(verbs, v, NULL);
+										  n++; }
+'d										{ fprintf(f, " had/would"); }
+[Hh]ow'll								{ fprintf(f, "%cow will", yytext[0]); }
+[Hh]ow's 								{ fprintf(f, "%cow has/is", yytext[0]); }
+[Oo]'clock								{ fprintf(f, "%cf the clock", yytext[0]); }
+[Oo]l'									{ fprintf(f, "%cld", yytext[0]); }
 
 
-.|\n							{ fprintf(f, "%s", yytext); }
-<*><<EOF>>						{ fprintf(f, "\t\t</textarea>\n\t"); 
-								  return 0;}
+.|\n									{ fprintf(f, "%s", yytext); }
+<*><<EOF>>								{ fprintf(f, "\t\t</textarea>\n\t"); 
+								  		  return 0;}
 
-[Tt]o\ {EXCEPTIONS}				{ fprintf(f, "%s", yytext); }
-[Tt]o\ [A-Z]                    { fprintf(f, "%s", yytext); }
-[Tt]o\ [0-9]+                   { fprintf(f, "%s", yytext); }
-[Tt]o\ {NUMBERS}				{ fprintf(f, "%s", yytext); }
-[Tt]o\ {ALPHA} 					{ fprintf(f, "%s", yytext);
-								  char *v = strdup(yytext+3);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
+[Tt]o\ {EXCEPTIONS}						{ fprintf(f, "%s", yytext); }
+[Tt]o\ [A-Z]                    		{ fprintf(f, "%s", yytext); }
+[Tt]o\ [0-9]+                   		{ fprintf(f, "%s", yytext); }
+[Tt]o\ {NUMBERS}						{ fprintf(f, "%s", yytext); }
+[Tt]o\ {SIGNAL}							{ fprintf(f, "%s", yytext); }
+[Tt]o\ {ALPHA} 							{ fprintf(f, "%s", yytext);
+								  	      char *v = strdup(yytext+3);
+								  		  g_tree_insert(verbs, v, NULL);
+								  		  n++; }
 
-[Bb][Tt][Ww]                    { fprintf(f, "%cy %che %cay", yytext[0], yytext[1], yytext[2]); }
-[Bb][Ff][Ff]                    { fprintf(f, "%cest %criend %corever", yytext[0], yytext[1], yytext[2]); }
-[Ii][Ll][Yy]                    { fprintf(f, "%c %cove %cou", yytext[0], yytext[1], yytext[2]); }
-[Ii][Dd][Gg][Aa][Ff]            { fprintf(f, "%c %con't %cive %c %cuck", yytext[0], yytext[1], yytext[2], yytext[3], yytext[4]); }
-[Jj][Kk]                        { fprintf(f, "%cust %cidding", yytext[0], yytext[1]); }
-[Ll][Mm][Aa][Oo]                { fprintf(f, "%caughing %cy %css %cff", yytext[0], yytext[1], yytext[2], yytext[3]); } 
-[Ll][Oo][Ll]                    { fprintf(f, "%caughing %cut %coud", yytext[0], yytext[1], yytext[2]); }
-[Nn][Pp]                        { fprintf(f, "%co %croblem", yytext[0], yytext[1]); }
-[Oo][Mm][Gg]                    { fprintf(f, "%ch %cy %cod", yytext[0], yytext[1], yytext[2]); }
-[Ww][Tt][Ff]                    { fprintf(f, "%chat %che %cuck", yytext[0], yytext[1], yytext[2]); }
+[Bb][Tt][Ww]                    		{ fprintf(f, "%cy %che %cay", yytext[0], yytext[1], yytext[2]); }
+[Bb][Ff][Ff]                    		{ fprintf(f, "%cest %criend %corever", yytext[0], yytext[1], yytext[2]); }
+[Ii][Ll][Yy]                    		{ fprintf(f, "%c %cove %cou", yytext[0], yytext[1], yytext[2]); }
+[Ii][Dd][Gg][Aa][Ff]            		{ fprintf(f, "%c %con't %cive %c %cuck", yytext[0], yytext[1], yytext[2], yytext[3], yytext[4]); }
+[Jj][Kk]                        		{ fprintf(f, "%cust %cidding", yytext[0], yytext[1]); }
+[Ll][Mm][Aa][Oo]                		{ fprintf(f, "%caughing %cy %css %cff", yytext[0], yytext[1], yytext[2], yytext[3]); } 
+[Ll][Oo][Ll]                    		{ fprintf(f, "%caughing %cut %coud", yytext[0], yytext[1], yytext[2]); }
+[Nn][Pp]                        		{ fprintf(f, "%co %croblem", yytext[0], yytext[1]); }
+[Oo][Mm][Gg]                    		{ fprintf(f, "%ch %cy %cod", yytext[0], yytext[1], yytext[2]); }
+[Ww][Tt][Ff]                    		{ fprintf(f, "%chat %che %cuck", yytext[0], yytext[1], yytext[2]); }
 
-[Dd]o\ [Ii]\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+5); 
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]o\ you\ {ALPHA}				{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+7); 
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]oes\ he\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+8);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]oes\ she\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+9);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]o\ we\ {ALPHA}				{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+6);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]o\ they\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+8);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]id\ [Ii]\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+6);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]id\ (he|we)\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+7);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]id\ (she|you)\ {ALPHA}	{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+8);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
-[Dd]id\ they\ {ALPHA}			{ fprintf(f, "%s", yytext);
-								  char* v = strdup(yytext+9);
-								  g_ptr_array_add(verbos, v);
-								  n++; }
+{QUESTIONS}\ {PRONOUNS}\ {ALPHA}		{ fprintf(f, "%s", yytext);
+										  strtok(yytext, " ");
+										  strtok(NULL, " ");
+								  		  char* v = strdup(strtok(NULL," ")); 
+								  		  g_tree_insert(verbs, v, NULL);
+								  		  n++; }
 %%
 
 int main(){
@@ -118,16 +88,16 @@ int main(){
 	htmlBegin(fp, "Verbs used in the infinitive form");
 	fprintf(f, "\t\t<textarea class='output_box'>\n");
 	fprintf(fp, "\t\t<ul class='verbs_list'>\n");
-
 	system("mv ~/Downloads/input.txt .");
 	yyin = fopen("input.txt", "r");
-	verbos = g_ptr_array_new();
+	verbs = g_tree_new((GCompareFunc)strcmp);
 	yylex();
-	g_ptr_array_sort(verbos, (GCompareFunc)strcmp);
-	imprimeVerbos(fp);
+	g_tree_foreach(verbs, (GTraverseFunc)printVerb, NULL);
 	fprintf(fp, "\t\t</ul>\n\t");
+	fprintf(fp, "<p></p><p>Repetições de verbos: %d</p>", (n-g_tree_nnodes(verbs)));
 	htmlEnd(f);
 	htmlEnd(fp);
+	g_tree_destroy(verbs);
 	fclose(yyin);
 	fclose(f);
 	fclose(fp);
@@ -150,11 +120,7 @@ void htmlEnd(FILE* f){
 	fprintf(f, "</html>");
 }
 
-void imprimeVerbos(FILE *fp){
-	int i;
-	for (i = 0; i < n; i++){
-		char *v = g_ptr_array_index(verbos, i);
-		fprintf(fp, "\t\t\t<li>%s</li>\n", v);
-	}
+gboolean printVerb(gpointer key, gpointer value, gpointer data) {
+	fprintf(fp, "\t\t\t<li>%s</li>\n", (char *) key);	
+	return FALSE;
 }
-
