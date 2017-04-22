@@ -1,6 +1,6 @@
 %option noyywrap
 %x CIDADE PAIS DATA PESSOA
-LETRA 		[a-zA-Z\-.]
+LETRA 		[a-zA-Z]|-|\.|ó|ã|ç|à|á|é|ê|ú|í|õ
 PALAVRA 	{LETRA}+
 ELEMENTO 	{PALAVRA}([ \n]{PALAVRA})*
 NUM 		[0-9]+
@@ -10,6 +10,7 @@ NUM 		[0-9]+
 
 	void setLimites(int);
 	void inserir(GTree *, char *);
+	void paragrafo2Espaco(char *);
 
 	int menor = 0;
 	int maior = 0;
@@ -33,12 +34,15 @@ NUM 		[0-9]+
 <DATA>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
 <CIDADE>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
 											inserir(cidades, chave);}
 <PAIS>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
 											inserir(paises, chave);}
 
 <DATA>({NUM}[ \n])?{ELEMENTO}			{	/*7 de Junho*/ /*Junho*/
 											char *v = strdup(yytext);
+											paragrafo2Espaco(v);
 											g_ptr_array_add(datas, v);
 											nDatas++;
 											}
@@ -61,11 +65,21 @@ NUM 		[0-9]+
 											setLimites(ano);}
 
 <PESSOA>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
 											inserir(pessoas, chave);}
 
 <*>.|\n 								{}
 
 %%
+
+void paragrafo2Espaco(char *chave){
+	int i, n = strlen(chave);
+	for (i = 0; i < n; i++){
+		if (chave[i] == '\n'){
+			chave[i] = ' ';
+		}
+	}
+}
 
 void setLimites(int ano){
 	if (ano < menor || menor == 0) menor = ano;
