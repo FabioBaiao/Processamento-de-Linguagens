@@ -82,7 +82,8 @@
 \maketitle
 
 \begin{abstract}
-Não sei o que escrever aqui!!!
+O Flex foi criado em 1987 pelo professor de Ciências da Computação da Universidade da Califórnia, Vern Edward Paxson e surge como alternativa grátis e \textit{open-source} ao Lex. É um programa que gera analisadores léxicos (também conhecidos como \textit{scanners}) com inúmeras utilidades para o dia-a-dia da população.\\
+É frequentemente usado junto do gerador de \textit{parser yacc} nos sistemas operativos \textit{BSD-derived}.
 \end{abstract}
 
 \tableofcontents
@@ -151,7 +152,7 @@ float maior = -INFINITY;
 
 
 
-\chapter{Apresentação das Queries e Resoluções}
+\chapter{Apresentação das Queries e Resoluções - TEMA1}
 
 Neste capítulo serão explicadas as queries realizadas. Na primeira secção apresentar-se-ão as queries obrigatórias sendo, de seguida, apresentadas as queries criadas adicionalmente pelo grupo.
 
@@ -247,7 +248,7 @@ Há, porém, situações em que surge dúvida sobre a palavra contraída, uma vez que 
 \caption{\label{fig:change}Contrações com múltiplas opções.}
 \end{figure}
 
-Em seguida procurou-se a cobertura de contrações não tão frequentes, como \textit{gonna}, \textit{cannot} e outras sugeridas por uma breve pesquisa na web, e passou-se à segunda etapa da resolução do problema: a listagem dos verbos utilizados no infinitivo no texto ao qual se aplica o processador FLEX. A definição da estrutura onde seriam armazenados os verbos, ao longo do processamento da análise do ficheiro de \textit{input}, foi o primeiro passo. A escolha recaiu sobre as árvores da biblioteca GLib, ao contrário do que acontecera na resolução da solução para o problema dos processadores de Named Entities, porque pretendia-se evitar que um verbo fosse introduzido no array mais do que uma vez. Nota também para a contagem do número de verbos identificados, através de uma variável \textit{n}, para controlo do número de verbos repetidos encontrados e, assim, não introduzidos - a diferença entre n e o número de elementos na árvore resulta no número de verbos repetidos identificados pelo processador de texto.
+Em seguida procurou-se a cobertura de contrações não tão frequentes, como \textit{gonna}, \textit{wanna} e outras sugeridas por uma breve pesquisa na web, e passou-se à segunda etapa da resolução do problema: a listagem dos verbos utilizados no infinitivo no texto ao qual se aplica o processador FLEX. A definição da estrutura onde seriam armazenados os verbos, ao longo do processamento da análise do ficheiro de \textit{input}, foi o primeiro passo. A escolha recaiu sobre as árvores da biblioteca GLib, à semelhança do que acontecera na resolução da solução para o problema dos processadores de Named Entities, porque pretendia-se evitar que um mesmo verbo fosse introduzido na estrutura mais do que uma vez. Assim, cada chave de um nodo na árvore representa um verbo e o valor o número de ocorrências desse mesmo verbo, ou seja, sempre que se encontra um verbo repetido, este não é inserido, apenas se incrementa o valor do nodo. Na Fig. 6.4 está a função responsável pela inserção na árvore. Nota também para a contagem do número de verbos identificados, através de uma variável \textit{n}, para controlo do número de verbos repetidos encontrados e, assim, não introduzidos - a diferença entre n e o número de elementos na árvore resulta no número de verbos repetidos identificados pelo processador de texto.
 %imagem da estrutura
 \begin{figure}[h]
 \centering
@@ -255,12 +256,18 @@ Em seguida procurou-se a cobertura de contrações não tão frequentes, como \texti
 \caption{\label{fig:change}Estrutura usada e variável auxiliar.}
 \end{figure}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{function.png}
+\caption{\label{fig:change}Função de inserção na árvore de verbos.}
+\end{figure}
+
 \newpage
 Chegou, então, a altura de pensar em que situações se usam verbos no infinitivo. Tal como consta no enunciado, os casos mais óbvios serão aqueles em que o verbo é usado com \textit{to} atrás ou quando surgem associados a palavras como \textit{do} ou \textit{did}, porém existem outras situações que o grupo procurou cobrir - a seguir a contrações como \textit{gonna} e \textit{wanna} ou a seguir a frases interrogativas com verbos modais (\textit{should}, \textit{may}, \textit{must}, etc.), por exemplo, a frase requer um verbo no infinitivo.
 %imagem das questoes
 \begin{figure}[h]
 \centering
-\includegraphics[width=120mm, scale=0.5]{questions+pronouns.png}
+\includegraphics[width=120mm, scale=0.5]{questions.png}
 \caption{\label{fig:change}Cobertura de verbos nas questões.}
 \end{figure}
 
@@ -270,7 +277,7 @@ Chegou, então, a altura de pensar em que situações se usam verbos no infinitivo.
 \caption{\label{fig:change}Inclusão dos verbos, usando as definições acima.}
 \end{figure}
 
-Nesta questão dos verbos há novamente um senão. Começando pelo facto de a palavra \textit{to} não ser usada apenas como antecessor de verbos, mas também como preposição, cria logo a necessidade de excluir diversos casos. Uma frase exemplo: \textit{I want to give a present to Anthony's brother.} - nesta frase temos dois \textit{to}, um que precede o verbo \textit{want} e outro que precede um complemento indireto. Apesar de ser díficil cobrir todas as situações, através da representação das exceções (Fig. 6.6) e das situações em que se segue letra maiúscula, números ou sinais de pontuação a um \textit{to}, consegue-se que a maioria dos \textit{to} seja corretamente identificada como verbo ou preposição.
+Nesta questão dos verbos há novamente um senão. Começando pelo facto de a palavra \textit{to} não ser usada apenas como antecessor de verbos, mas também como preposição, cria logo a necessidade de excluir diversos casos. Uma frase exemplo: \textit{I want to give a present to Anthony's brother.} - nesta frase temos dois \textit{to}, um que precede o verbo \textit{want} e outro que precede um complemento indireto. Apesar de ser díficil cobrir todas as situações, através da representação das exceções (Fig. 6.5) e das situações em que se segue letra maiúscula, números ou sinais de pontuação a um \textit{to}, consegue-se que a maioria dos \textit{to} seja corretamente identificada como verbo ou preposição.
 %imagem dos casos excluídos
 \begin{figure}[h]
 \centering
@@ -284,7 +291,6 @@ Nesta questão dos verbos há novamente um senão. Começando pelo facto de a palavr
 \caption{\label{fig:change}Casos em que o \textit{to} não antecede um verbo.}
 \end{figure}
 
-\newpage
 Por fim, para aumentar a área de atuação do processador FLEX, decidiu-se colocar algumas abreviaturas, para além de contrações, no lote de expressões regulares filtradas.
 %imagem das abreviaturas
 \begin{figure}[h]
@@ -293,8 +299,74 @@ Por fim, para aumentar a área de atuação do processador FLEX, decidiu-se colocar
 \caption{\label{fig:change}Abreviaturas incluídas.}
 \end{figure}
 
-\chapter{Conclusão} \label{concl}
+\chapter{Apresentação das Queries e Resoluções - TEMA 2}
 
+\section{Queries de Resolução Obrigatória}
+Naturalmente, como queries obrigatórias procurou-se responder à listagem dos verbos usados no infinitivo e à remoção de contrações, típicas do inglês corrente, tal como aponta o enunciado.
+
+\section{Queries Adicionais}
+
+\begin{enumerate}[a)]
+
+\item Adicional 1
+Adição de abreviaturas, para respetiva expansão, à filtragem do processador de texto;
+
+
+\item Adicional 2
+Contagem do número de repetições de cada verbo usado no infinitivo.
+
+
+\end{enumerate}
+
+
+\chapter{Apresentação de Resultados}
+
+Neste capítulo serão apresentados exemplos de utilização.
+
+\section{Execução}
+
+A conversão de inglês corrente envolve as seguintes etapas:
+
+\begin{enumerate}
+	\item Colar o texto a converter na caixa de texto;
+	\item Confirmar o armazenamento num ficheiro;
+	\item Correr o programa FLex;
+	\item Ver resultados.
+\end{enumerate}
+
+\section{Exemplos}
+
+Agora apresentar-se-ão os resultados da aplicação quando recebeu como \textit{input} os seguintes textos:
+
+\begin{enumerate}
+	\item FAQ-Python-En.txt, fornecido pela equipa docente aquando do lançamento deste enunciado;
+	\item OUTRO
+\end{enumerate}
+
+Relativamente ao primeiro caso, a quantidade de contrações é reduzida apesar do tamanho do texto. O processador alcança bons resultados, quer nos verbos listados quer no texto sem contrações, no entanto sobressaem dois erros recorrentes:
+
+\begin{enumerate}
+	\item a colocação por extenso da contração \textit{'s} quando esta atua enquanto símbolo de posse (\textit{possessive 's}). Este é o tipo de erro difícil de combater, visto que \textit{'s} pode ser usado como contração de \textit{is} ou \textit{has}, mas também no contexto de posse (\textit{Anthony's house is red.});
+	\item a inclusão de advérbios na listagem de verbos, resultante de frases do género de \textit{He has to seriously consider it!}, onde o advérbio toma a posição do verbo, isto é, a seguir ao \textit{to}, perturbando a eficácia do processador.
+\end{enumerate} 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{adverbError.png}
+\caption{\label{fig:change}Advérbio na listagem de verbos.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=100mm, scale=0.5]{verbsList.png}
+\caption{\label{fig:change}Excerto da listagem de verbos.}
+\end{figure}
+
+
+\chapter{Conclusão} \label{concl}
+Terminado o projeto, salientamos a utilidade e facilidade do uso do Flex na criação de filtros a aplicar a textos, algo que se tornaria bem mais complexo se contruíssemos e utilizássemos um programa em C ou noutra linguagem de programação mais comum.\\
+Mais uma vez, como no TP1a - GAWK, é de destacar a criação de uma página HTML, que, apesar de já ter sido também criada para o trabalho referido, permanece algo novo entre o grupo e ainda assim com resultados, na nossa perspetiva, bastante satisfatórios.\\
+Quanto a trabalho futuro, seria lógico, no caso do Exercício 2.1., continuar a desenvolver casos para tentar aproximar da perfeição o filtro. Da mesma forma, falando agora sobre o trabalho futuro para o Exercício 2.4., será lógico que o próximo passo seja a criação de mais Tags que possam ser incluídas no ficheiro XML e identificadas pelo filtro Flex.
 
 
 \end{document} 
