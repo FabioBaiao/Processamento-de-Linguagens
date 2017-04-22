@@ -12,13 +12,15 @@
 	int n = 0;
 	FILE *fp, *f;
 %}
-QUESTIONS	[Dd]o|[Dd]oes|[Dd]id|[Ss]hall|[Ss]hould|[Mm]ay|[Mm]ight|[Cc]an|[Cc]ould|[Ww]ill|[Ww]ould|[Oo]ught|[Mm]ust
+MODAL		[Ss]hall|[Ss]hould|[Mm]ay|[Mm]ight|[Cc]an|[Cc]ould|[Ww]ill|[Ww]ould|[Oo]ught|[Mm]ust
+QUESTIONS	[Dd]o|[Dd]oes|[Dd]id|{MODAL}
 NEGATIVE	[Dd]on't|[Dd]oesn't|[Dd]idn't|[Ss]houldn't|[Mm]ightn't|[Cc]ouldn't|[Mm]ustn't|[Ww]ouldn't
 SUBJECT		[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey|[A-Z]{1}[a-z]+
 ALPHA		[a-z]+
 SIGNAL		[,;:.-?!\n\t]
-EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that
-NUMBERS 	one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety	
+EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that|by|also|other|another|always|never|each|still|then
+NUMBERS 	zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety	
+VERBS 		[Cc]onvert(ed)?|[Ll]e(a)?d|[Pp]oint(ed)?|[Rr]efer(ed)?|[Aa]ssign(ed)?
 
 %%
 
@@ -28,11 +30,17 @@ Ain't 									{ fprintf(f, " _Am/Is/Are/Has/Have not_"); }
 [Ww]on't 								{ fprintf(f, " _%cill not_", yytext[0]); }
 [Cc]an't								{ fprintf(f, "_%cannot_", yytext[0]); }
 n't 									{ fprintf(f, " _not_"); }
-
 'm										{ fprintf(f, " _am_"); }
 'll										{ fprintf(f, " _will/shall_"); }
 're										{ fprintf(f, " _are_"); }
 's										{ fprintf(f, " _is_"); }
+[Cc]'mon								{ fprintf(f, "_%come on_", yytext[0]); }
+'ve										{ fprintf(f, " _have_"); }
+'d										{ fprintf(f, " _had/would_"); }
+[Hh]ow'll								{ fprintf(f, "_%cow will_", yytext[0]); }
+[Hh]ow's 								{ fprintf(f, "_%cow has/is_", yytext[0]); }
+[Oo]'clock								{ fprintf(f, "_%cf the clock_", yytext[0]); }
+[Oo]l'									{ fprintf(f, "_%cld_", yytext[0]); }
 [Gg]onna\ {ALPHA}						{ fprintf(f, "_%coing to %s_", yytext[0], yytext+6);
 								  		  char *v = strdup(yytext+6);
 								    	  insert(verbs, v);
@@ -41,19 +49,10 @@ n't 									{ fprintf(f, " _not_"); }
 								  		  char *v = strdup(yytext+6);
 								    	  insert(verbs, v);
 								  		  n++; }
-[Cc]'mon								{ fprintf(f, "_%come on_", yytext[0]); }
-'ve										{ fprintf(f, " _have_"); }
 [Gg]otta\ {ALPHA}						{ fprintf(f, "_%cot to %s_", yytext[0], yytext+6);
 										  char *v = strdup(yytext+6);
 										  insert(verbs, v);
 										  n++; }
-'d										{ fprintf(f, " _had/would_"); }
-[Hh]ow'll								{ fprintf(f, "_%cow will_", yytext[0]); }
-[Hh]ow's 								{ fprintf(f, "_%cow has/is_", yytext[0]); }
-[Oo]'clock								{ fprintf(f, "_%cf the clock_", yytext[0]); }
-[Oo]l'									{ fprintf(f, "_%cld_", yytext[0]); }
-
-
 .|\n									{ fprintf(f, "%s", yytext); }
 <*><<EOF>>								{ fprintf(f, "\t\t</textarea>\n\t"); 
 								  		  return 0;}
@@ -66,19 +65,25 @@ n't 									{ fprintf(f, " _not_"); }
 [Tt]o\ {ALPHA} 							{ fprintf(f, "%s", yytext);
 								  	      char *v = strdup(yytext+3);
 								  		  insert(verbs, v);
-								  		  n++; }
+								  		  n++; }	
+{VERBS}\ to\ {ALPHA}					{ fprintf(f, "%s", yytext); }										  						  	  
+[\n ][Bb][Tt][Ww]                    	{ fprintf(f, "_%cy %che %cay_", yytext[0], yytext[1], yytext[2]); }
+[\n ][Bb][Ff][Ff]                    	{ fprintf(f, "_%cest %criend %corever_", yytext[0], yytext[1], yytext[2]); }
+[\n ][Ii][Ll][Yy]                    	{ fprintf(f, " _%c %cove %cou_", yytext[0], yytext[1], yytext[2]); }
+[\n ][Ii][Dd][Gg][Aa][Ff]            	{ fprintf(f, "_%c %con't %cive %c %cuck_", yytext[0], yytext[1], yytext[2], yytext[3], yytext[4]); }
+[\n ][Jj][Kk]                        	{ fprintf(f, "_%cust %cidding_", yytext[0], yytext[1]); }
+[\n ][Ll][Mm][Aa][Oo]                	{ fprintf(f, "_%caughing %cy %css %cff_", yytext[0], yytext[1], yytext[2], yytext[3]); } 
+[\n ][Ll][Oo][Ll]                    	{ fprintf(f, "_%caughing %cut %coud_", yytext[0], yytext[1], yytext[2]); }
+[\n ][Nn][Pp]                        	{ fprintf(f, "_%co %croblem_", yytext[0], yytext[1]); }
+[\n ][Oo][Mm][Gg]                    	{ fprintf(f, "_%ch %cy %cod_", yytext[0], yytext[1], yytext[2]); }
+[\n ][Ww][Tt][Ff]                    	{ fprintf(f, "_%chat %che %cuck_", yytext[0], yytext[1], yytext[2]); }
 
-[\n ][Bb][Tt][Ww]                    		{ fprintf(f, "_%cy %che %cay_", yytext[0], yytext[1], yytext[2]); }
-[\n ][Bb][Ff][Ff]                    		{ fprintf(f, "_%cest %criend %corever_", yytext[0], yytext[1], yytext[2]); }
-[\n ][Ii][Ll][Yy]                    		{ fprintf(f, " _%c %cove %cou_", yytext[0], yytext[1], yytext[2]); }
-[\n ][Ii][Dd][Gg][Aa][Ff]            		{ fprintf(f, "_%c %con't %cive %c %cuck_", yytext[0], yytext[1], yytext[2], yytext[3], yytext[4]); }
-[\n ][Jj][Kk]                        		{ fprintf(f, "_%cust %cidding_", yytext[0], yytext[1]); }
-[\n ][Ll][Mm][Aa][Oo]                		{ fprintf(f, "_%caughing %cy %css %cff_", yytext[0], yytext[1], yytext[2], yytext[3]); } 
-[\n ][Ll][Oo][Ll]                    		{ fprintf(f, "_%caughing %cut %coud_", yytext[0], yytext[1], yytext[2]); }
-[\n ][Nn][Pp]                        		{ fprintf(f, "_%co %croblem_", yytext[0], yytext[1]); }
-[\n ][Oo][Mm][Gg]                    		{ fprintf(f, "_%ch %cy %cod_", yytext[0], yytext[1], yytext[2]); }
-[\n ][Ww][Tt][Ff]                    		{ fprintf(f, "_%chat %che %cuck_", yytext[0], yytext[1], yytext[2]); }
-
+{MODAL}\ {EXCEPTIONS}					{ fprintf(f, "%s", yytext); }
+{MODAL}\ {ALPHA}						{ fprintf(f, "%s", yytext);
+										  strtok(yytext, " ");
+										  char* v = strdup(strtok(NULL, " "));
+										  insert(verbs, v);
+										  n++; }	
 {QUESTIONS}\ {SUBJECT}\ {ALPHA} 		{ fprintf(f, "%s", yytext);
 										  strtok(yytext, " ");
 										  strtok(NULL, " ");
@@ -93,16 +98,34 @@ n't 									{ fprintf(f, " _not_"); }
 										  n++;  }								  		  
 [Ww]on't\ {SUBJECT}\ {ALPHA}			{ strtok(yytext, " ");
 										  char* subject = strtok(NULL, " ");
-										  char* v = strtok(NULL, " ");
+										  char* v = strdup(strtok(NULL, " "));
 										  fprintf(f, "%cill not %s %s", yytext[0], subject, v);
 										  insert(verbs, v);
 										  n++;  }
+[Cc]an't\ {ALPHA}						{ strtok(yytext, " ");
+										  char* v = strdup(strtok(NULL, " "));
+										  fprintf(f, "%cannot %s", yytext[0], v);
+										  insert(verbs, v);
+										  n++;  }								  		  
+[Ww]on't\ {ALPHA}						{ strtok(yytext, " ");
+										  char* v = strdup(strtok(NULL, " "));
+										  fprintf(f, "%cill not %s", yytext[0], v);
+										  insert(verbs, v);
+										  n++;  }										 
 {NEGATIVE}\ {SUBJECT}\ {ALPHA}			{ char* rep = strdup(yytext);
 										  char* neg = strtok(yytext, "n't");
 										  strtok(rep, " ");
 										  char* subject = strtok(NULL, " ");
-										  char* v = strtok(NULL, " ");
+										  char* v = strdup(strtok(NULL, " "));
 										  fprintf(f, "%s not %s %s", neg, subject, v);
+										  insert(verbs, v);
+										  n++;
+									  	  free(rep); }
+{NEGATIVE}\ {ALPHA}						{ char* rep = strdup(yytext);
+										  char* neg = strtok(yytext, "n't");
+										  strtok(rep, " ");
+										  char* v = strdup(strtok(NULL, " "));
+										  fprintf(f, "%s not %s", neg, v);
 										  insert(verbs, v);
 										  n++;
 									  	  free(rep); }
