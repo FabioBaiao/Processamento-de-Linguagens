@@ -18,7 +18,7 @@ NEGATIVE	[Dd]on't|[Dd]oesn't|[Dd]idn't|[Ss]houldn't|[Mm]ightn't|[Cc]ouldn't|[Mm]
 SUBJECT		[Ii]|[Yy]ou|[Hh]e|[Ss]he|[Ww]e|[Tt]hey|[A-Z]{1}[a-z]+
 ALPHA		[a-z]+
 SIGNAL		[,;:.-?!\n\t]
-EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that|by|also|other|another|always|never|each|still|then
+EXCEPTIONS 	me|you|him|it|us|them|my|your|his|her|its|our|their|mine|yours|hers|ours|theirs|the|a|an|all|many|this|that|by|also|other|another|always|never|each|still|then|[a-z]+[ing]
 NUMBERS 	zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety	
 VERBS 		[Cc]onvert(ed)?|[Ll]e(a)?d|[Pp]oint(ed)?|[Rr]efer(ed)?|[Aa]ssign(ed)?
 
@@ -31,7 +31,10 @@ Ain't 									{ fprintf(f, " _Am/Is/Are/Has/Have not_"); }
 [Cc]an't								{ fprintf(f, "_%cannot_", yytext[0]); }
 n't 									{ fprintf(f, " _not_"); }
 'm										{ fprintf(f, " _am_"); }
-'ll										{ fprintf(f, " _will/shall_"); }
+'ll\ {ALPHA}							{ fprintf(f, " _will/shall_ %s", yytext+4);
+										  char *v = strdup(yytext+4);
+								    	  insert(verbs, v);
+								  		  n++; }
 're										{ fprintf(f, " _are_"); }
 's										{ fprintf(f, " _is_"); }
 [Cc]'mon								{ fprintf(f, "_%come on_", yytext[0]); }
@@ -93,23 +96,23 @@ n't 									{ fprintf(f, " _not_"); }
 [Cc]an't\ {SUBJECT}\ {ALPHA}			{ strtok(yytext, " ");
 										  char* subject = strtok(NULL, " ");
 										  char* v = strdup(strtok(NULL, " "));
-										  fprintf(f, "%cannot %s %s", yytext[0], subject, v);
+										  fprintf(f, "_%cannot_ %s %s", yytext[0], subject, v);
 										  insert(verbs, v);
 										  n++;  }								  		  
 [Ww]on't\ {SUBJECT}\ {ALPHA}			{ strtok(yytext, " ");
 										  char* subject = strtok(NULL, " ");
 										  char* v = strdup(strtok(NULL, " "));
-										  fprintf(f, "%cill not %s %s", yytext[0], subject, v);
+										  fprintf(f, "_%cill not_ %s %s", yytext[0], subject, v);
 										  insert(verbs, v);
 										  n++;  }
 [Cc]an't\ {ALPHA}						{ strtok(yytext, " ");
 										  char* v = strdup(strtok(NULL, " "));
-										  fprintf(f, "%cannot %s", yytext[0], v);
+										  fprintf(f, "_%cannot_ %s", yytext[0], v);
 										  insert(verbs, v);
 										  n++;  }								  		  
 [Ww]on't\ {ALPHA}						{ strtok(yytext, " ");
 										  char* v = strdup(strtok(NULL, " "));
-										  fprintf(f, "%cill not %s", yytext[0], v);
+										  fprintf(f, "_%cill not_ %s", yytext[0], v);
 										  insert(verbs, v);
 										  n++;  }										 
 {NEGATIVE}\ {SUBJECT}\ {ALPHA}			{ char* rep = strdup(yytext);
@@ -129,7 +132,6 @@ n't 									{ fprintf(f, " _not_"); }
 										  insert(verbs, v);
 										  n++;
 									  	  free(rep); }
-
 %%
 
 int main(){
