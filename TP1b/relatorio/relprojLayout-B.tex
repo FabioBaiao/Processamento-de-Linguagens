@@ -127,30 +127,128 @@ As etiquetas \textit{ENAMEX} e \textit{TIMEX} permitem identificar, respetivamen
 \chapter{Apresentação da Solução} \label{ae}
 
 \section{Análise do problema}
-Perante a necessidade de escrever um processador capaz de analisar um documento como o mencionado acima e produzir um índice HTML para cada um dos tipos da etiqueta \textit{ENAMEX}, começou-se por definir a estrutura usada para armazenar os nomes próprios de cada tipo, durante o processamento do ficheiro. A escolha recaiu pelo uso de arrays, um por tipo, particularmente os \textit{pointer arrays} da biblioteca \textbf{GLib}, por facilidade de utilização e por terem sido abordados em aulas práticas.
+Perante a necessidade de escrever um processador capaz de analisar um documento como o mencionado acima e produzir um índice HTML para cada um dos tipos da etiqueta \textit{ENAMEX}, começou-se por definir a estrutura usada para armazenar os nomes próprios de cada tipo, durante o processamento do ficheiro. A escolha recaiu pelo uso de árvores binárias balanceadas, uma por tipo, particularmente os \textit{trees} da biblioteca \textbf{GLib}, por facilidade de utilização e por terem sido abordados em aulas práticas. No entanto, a principal razão é a de se pretender saber o número de ocorrências para cada nome próprio. Uma vez que cada nodo da árvore é um par chave-valor, é possível guardar, para cada chave, o número de ocorrências.
 
 \begin{verbatim}
-GPtrArray *cidades, *paises, *pessoas;
+GTree *cidades, *paises, *pessoas;
 \end{verbatim}
 
-Nota também para o uso de variáveis que contabilizam as ocorrências de cada um dos tipos \textit{ENAMEX}, auxiliares posteriormente na impressão dos índices HTML.\\
 Para determinar o maior e o menor ano mencionados no texto criaram-se duas variáveis, uma para cada ano, cujo valor será controlado por intermédio de comparações de valor, à medida que vamos percorrendo o ficheiro.
 
 \begin{verbatim}
-float menor = +INFINITY;
-float maior = -INFINITY;
+int menor = 0;
+int maior = 0;
 
 (...)
 
-<DATA>{NUM} 		{	int ano = atoi(yytext);
-						if (ano < menor) menor = ano;
-						if (ano > maior) maior = ano;	}
+void setLimites(int ano){
+	if (ano < menor || menor == 0) menor = ano;
+	if (ano > maior || maior == 0) maior = ano;
+}
 \end{verbatim}
-	
 
-\section{Outras Cenas}
+Além destes dois indicadores, decidiu-se criar também um índice HTML que indica todas as datas mencionadas. Para isso, utilizou-se arrays (mais concretamente \textit{pointer arrays}) da biblioteca GLib como estrutura para armazenar as datas.
+
+\begin{verbatim}
+GPtrArray *datas;
+\end{verbatim}
+
+\section{Regras ...}
+
+O comportamento a adotar em cada entidade depende da etiqueta correspondente. Assim, para simplificar a escrita do programa, criou-se uma start condition para cada etiqueta. Para cada caso de "abertura" é iniciada a start condition respetiva. 
+
+\begin{verbatim}
+%x CIDADE PAIS DATA PESSOA
+
+(...)
+
+\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
+\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
+\<ENAMEX\ TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
+\<TIMEX\ TYPE=\"DATE\"\>		{BEGIN(DATA);}
+\end{verbatim}
+
+Desta forma, torna-se mais fácil controlar as regras que são testadas. As regras para cada tipo de nomes próprios são muito idênticas, variando na estrutura de dados em que os dados são inseridos.
+
+\begin{verbatim}
+<CIDADE>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
+											inserir(cidades, chave);}
+<PAIS>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
+											inserir(paises, chave);}
+<PESSOA>{ELEMENTO} 						{	char *chave = strdup(yytext);
+											paragrafo2Espaco(chave);
+											inserir(pessoas, chave);}
+\end{verbatim}
+
+O ELEMENTO é uma definição criada na primeira secção. Consiste numa PALAVRA seguida de 0 ou mais conjuntos de espaço/newline e PALAVRA. Por sua vez, uma PALAVRA é uma sequência de uma ou mais LETRA. Por fim, uma LETRA é definida por todas as letras do alfabeto (minúsculas e maiúsculas) e outros caracteres relevantes.
+
+\begin{verbatim}
+LETRA 		[a-zA-Z]|-|\.|ó|ã|ç|à|á|é|ê|ú|í|õ
+PALAVRA 	{LETRA}+
+ELEMENTO 	{PALAVRA}([ \n]{PALAVRA})*
+\end{verbatim} 
+
+A função "paragrafo2Espaco" converte os "\n" encontrados, em espaços. 
+A função "inserir" insere um nome próprio com o valor 1 caso ainda não existe na árvore respetiva. Se já existir apenas incrementa o valor correspondente à chave.
+
+\begin{verbatim}
+void paragrafo2Espaco(char *chave){
+	int i, n = strlen(chave);
+	for (i = 0; i < n; i++){
+		if (chave[i] == '\n'){
+			chave[i] = ' ';
+		}
+	}
+}
+
+void inserir(GTree *arvore, char *chave){
+	int *valor = g_tree_lookup(arvore, chave);
+	if (valor != NULL){
+		(*valor)++;
+	}
+	else{
+		valor = malloc(sizeof(int));
+		*valor = 1;
+	}
+	g_tree_insert(arvore, chave, valor);
+}
+\end{verbatim} 
 
 
+
+Para o caso das datas, estas podem aparecer em formatos diferentes. Os formatos encontrados foram: \textit{ano}; \textit{dia/mes/ano}; \textit{dia} de \textit{mes}; \textit{mes}. Nos dois últimos casos, o mês aparece escrito por extenso. 
+Qualquer que seja o formato, é necessário guardar o padrão encontrado no array. Esse comportamento é descrito da mesma forma para todos os formatos. No entanto, como os dois primeiros formatos enunciados contêm o ano, usa-se a função "setLimites" (referida anteriormente) para definir os anos mais antigo/recente. 
+
+\begin{verbatim}
+<DATA>({NUM}[ \n])?{ELEMENTO}			{	char *v = strdup(yytext);
+											paragrafo2Espaco(v);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											}
+<DATA>{NUM}\/{NUM}\/{NUM}				{	char *v = strdup(yytext);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											char sep[2] = "/";
+											char *token = strtok(yytext, sep);
+											token = strtok(NULL, sep);
+											token = strtok(NULL, sep);
+											v = strdup(token);
+											int ano = atoi(v);
+											setLimites(ano);}
+<DATA>{NUM} 							{	char *v = strdup(yytext);
+											g_ptr_array_add(datas, v);
+											nDatas++;
+											int ano = atoi(yytext);
+											setLimites(ano);}
+\end{verbatim} 
+
+O NUM consiste numa sequência de um ou mais números.
+
+\begin{verbatim}
+NUM 		[0-9]+
+\end{verbatim}
 
 \chapter{Apresentação das Queries e Resoluções - TEMA1}
 
