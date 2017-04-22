@@ -1,6 +1,6 @@
 %option noyywrap
 %x CIDADE PAIS DATA PESSOA
-LETRA 		[a-zA-Z]|-|\.|ó|ã|ç|à|á|é|ê|ú|í|õ
+LETRA 		[a-zA-Z\-.]
 PALAVRA 	{LETRA}+
 ELEMENTO 	{PALAVRA}([ \n]{PALAVRA})*
 NUM 		[0-9]+
@@ -10,7 +10,6 @@ NUM 		[0-9]+
 
 	void setLimites(int);
 	void inserir(GTree *, char *);
-	void paragrafo2Espaco(char *);
 
 	int menor = 0;
 	int maior = 0;
@@ -34,15 +33,12 @@ NUM 		[0-9]+
 <DATA>\<\/TIMEX\> 						{BEGIN(INITIAL);}
 
 <CIDADE>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
 											inserir(cidades, chave);}
 <PAIS>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
 											inserir(paises, chave);}
 
 <DATA>({NUM}[ \n])?{ELEMENTO}			{	/*7 de Junho*/ /*Junho*/
 											char *v = strdup(yytext);
-											paragrafo2Espaco(v);
 											g_ptr_array_add(datas, v);
 											nDatas++;
 											}
@@ -65,21 +61,11 @@ NUM 		[0-9]+
 											setLimites(ano);}
 
 <PESSOA>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
 											inserir(pessoas, chave);}
 
 <*>.|\n 								{}
 
 %%
-
-void paragrafo2Espaco(char *chave){
-	int i, n = strlen(chave);
-	for (i = 0; i < n; i++){
-		if (chave[i] == '\n'){
-			chave[i] = ' ';
-		}
-	}
-}
 
 void setLimites(int ano){
 	if (ano < menor || menor == 0) menor = ano;
@@ -150,6 +136,17 @@ void footerHTML(FILE *f) {
 }
 
 gboolean printNodo(gpointer key, gpointer value, gpointer data) {
+	char* maps_addr = malloc(128);
+	char* maps_img = "<img class='maps' src='google_maps.png'/></a>";
+	sprintf(maps_addr, "<a target='_blank' href='https://www.google.pt/maps/place/%s'>", (char* )key);
+	fprintf(data, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
+	fprintf(data, "\t\t\t\t\t\t\t<td>%s%s%s</td>\n", (char *) key, maps_addr, maps_img);
+	fprintf(data, "\t\t\t\t\t\t\t<td>%d</td>\n", *((int *) value));
+	free(maps_addr);
+	return FALSE;
+}
+
+gboolean printNodo_pessoas(gpointer key, gpointer value, gpointer data) {
 	fprintf(data, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t<tr>\n");
 	fprintf(data, "\t\t\t\t\t\t\t<td>%s</td>\n", (char *) key);
 	fprintf(data, "\t\t\t\t\t\t\t<td>%d</td>\n", *((int *) value));
@@ -198,7 +195,7 @@ void imprimePessoas(FILE* f, char* title){
 	fprintf(f, "\t\t\t\t\t\t\t<th>Pessoa</th>\n");
 	fprintf(f, "\t\t\t\t\t\t\t<th>Nº de ocorrências</th>\n");
 	
-	g_tree_foreach(pessoas, (GTraverseFunc)printNodo, f);
+	g_tree_foreach(pessoas, (GTraverseFunc)printNodo_pessoas, f);
 
 	fprintf(f, "\t\t\t\t\t\t</tr>\n\t\t\t\t\t</table>\n");
 	fprintf(f, "\t\t\t\t</div>\n\t\t\t</div>\n");
