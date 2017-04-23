@@ -153,7 +153,7 @@ Além destes dois indicadores, decidiu-se criar também um índice HTML que indica 
 GPtrArray *datas;
 \end{verbatim}
 
-\section{Regras ...}
+\section{Regras definidas}
 
 O comportamento a adotar em cada entidade depende da etiqueta correspondente. Assim, para simplificar a escrita do programa, criou-se uma start condition para cada etiqueta. Para cada caso de "abertura" é iniciada a start condition respetiva. 
 
@@ -249,7 +249,7 @@ O NUM consiste numa sequência de um ou mais números.
 NUM         [0-9]+
 \end{verbatim}
 
-\section{Resultados ...}
+\section{Resultados}
 
 Para a apresentação de resultados, e ignorando o código necessário para gerar as páginas HTML, é necessário iterar pelas estruturas de dados. 
 No caso das datas basta iterar de 0 até ao número de elementos inseridos. Para os nomes próprios, uma vez que estão guardados em árvores, não é possível iterar a partir de indíces. Assim, foi necessário criar uma função que realize as operações desejadas para cada nodo, para que seja usada pela função \verb|g_tree_foreach|. Esta função, para além de receber a chave e o valor respetivo, recebe ainda o ficheiro para onde terá de escrever os dados.
@@ -275,44 +275,6 @@ g_tree_foreach(arvore, (GTraverseFunc)printNodo, f);
 \end{verbatim}
 
 
-\chapter{Apresentação das Queries e Resoluções - TEMA1}
-
-Neste capítulo serão explicadas as queries realizadas. Na primeira secção apresentar-se-ão as queries obrigatórias sendo, de seguida, apresentadas as queries criadas adicionalmente pelo grupo.
-
-\section{Queries de Resolução Obrigatória}
-
- 
-
-\bigskip
-
-\begin{enumerate}[a)]
-\item Produzir um índice em HTML com as Pessoas, Países e Cidades referidas.
-
-
-
-\bigskip
-
-\item Usar o Google Maps para localizar as cidades referidas.
-
-
-
-\end{enumerate}
-
-\section{Queries Adicionais}
-
-\begin{enumerate}[a)]
-
-\item Adicional 1
-
-
-
-\item Adicional 2
-
-
-
-\end{enumerate}
-
-
 \chapter{Apresentação de Resultados}
 
 Neste capítulo serão apresentados exemplos de utilização.
@@ -329,35 +291,37 @@ O programa abre automaticamente o menu principal realtivo ao ENAMEX no browser f
 
 \section{Exemplos}
 
+Os exemplos que serão mostrados de seguida foram obtidos usando uma adaptação do ficheiro exemplo-Enamex.xml fornecido pela equipa docente.
+
 Abrindo o menu principal aparece o seguinte resultado:
 
-%\begin{figure}[h]
-%\centering
-%\includegraphics[width=120mm, scale=0.5]{Menu-Principal.png}
-%\caption{\label{fig:change}Menu Principal.}
-%\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{Enamex.png}
+\caption{\label{fig:change}Menu de Enamex.}
+\end{figure}
 
 Utilizando o menu de navegação superior para clicar em TIMEX, obtem-se a página relativa às datas. 
 Estando na página relativa aos nomes próprios é possível consultar, a partir do menu lateral, os dados relativos às pessoas, cidades ou países.
 Da mesma forma, é possível consultar os limites e as datas estando na página relativa às datas.
 
-%\begin{figure}[h]
-%\centering
-%\includegraphics[width=120mm, scale=0.5]{Dados-Cliente.png}
-%\caption{\label{fig:change}Dados do Cliente.}
-%\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{Timex.png}
+\caption{\label{fig:change}Menu de Timex.}
+\end{figure}
 
-%\begin{figure}[h]
-%\centering
-%\includegraphics[width=120mm, scale=0.5]{Numero-Entradas.png}
-%\caption{\label{fig:change}Número de entradas em cada dia.}
-%\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{Pessoas.png}
+\caption{\label{fig:change}Lista de pessoas referidas.}
+\end{figure}
 
-%\begin{figure}[h]
-%\centering
-%\includegraphics[width=120mm, scale=0.5]{Locais-Entrada.png}
-%\caption{\label{fig:change}Locais de entrada e número de visitas.}
-%\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{Cronologia.png}
+\caption{\label{fig:change}Anos mais antigo e recente referidos.}
+\end{figure}
 
 
 \chapter{Processador de inglês corrente} \label{ingles}
@@ -429,25 +393,6 @@ Por fim, para aumentar a área de atuação do processador FLEX, decidiu-se colocar
 \caption{\label{fig:change}Abreviaturas incluídas.}
 \end{figure}
 
-\chapter{Apresentação das Queries e Resoluções - TEMA 2}
-
-\section{Queries de Resolução Obrigatória}
-Naturalmente, como queries obrigatórias procurou-se responder à listagem dos verbos usados no infinitivo e à remoção de contrações, típicas do inglês corrente, tal como aponta o enunciado.
-
-\section{Queries Adicionais}
-
-\begin{enumerate}[a)]
-
-\item Adicional 1
-Adição de abreviaturas, para respetiva expansão, à filtragem do processador de texto;
-
-
-\item Adicional 2
-Contagem do número de repetições de cada verbo usado no infinitivo.
-
-
-\end{enumerate}
-
 
 \chapter{Apresentação de Resultados}
 
@@ -500,7 +445,7 @@ Para além do Ficheiro disponibilizado para teste, decidimos exmplificar a utiliz
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=120mm, scale=0.5]{InputExample2.png.png}
+\includegraphics[width=120mm, scale=0.5]{InputExample2.png}
 \caption{\label{fig:change}Input Exemplo 2.}
 \end{figure}
 
