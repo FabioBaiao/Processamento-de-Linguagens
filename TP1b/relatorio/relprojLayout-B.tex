@@ -470,7 +470,7 @@ Agora apresentar-se-ão os resultados da aplicação quando recebeu como \textit{in
 
 \begin{enumerate}
     \item FAQ-Python-En.txt, fornecido pela equipa docente aquando do lançamento deste enunciado;
-    \item OUTRO
+    \item "Harry-Potter-e-a-Câmara-dos-Segredos-Cap1-FirstParagraphs"
 \end{enumerate}
 
 Relativamente ao primeiro caso, a quantidade de contrações é reduzida apesar do tamanho do texto. O processador alcança bons resultados, quer nos verbos listados quer no texto sem contrações, no entanto sobressaem dois erros recorrentes:
@@ -491,6 +491,33 @@ Relativamente ao primeiro caso, a quantidade de contrações é reduzida apesar do 
 \includegraphics[width=100mm, scale=0.5]{verbsList.png}
 \caption{\label{fig:change}Excerto da listagem de verbos.}
 \end{figure}
+
+Para além do Ficheiro disponibilizado para teste, decidimos exmplificar a utilização do programa com um outro:
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{InputExample2.png.png}
+\caption{\label{fig:change}Input Exemplo 2.}
+\end{figure}
+
+Vemos em cima o texto de input sobre o qual o programa irá expandir as contrações, bem como listar os verbos no infinitivo e na imagem que se segue o output gerado pelo programa FLex.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{OutputExample2.png}
+\caption{\label{fig:change}Output Exemplo 2.}
+\end{figure}
+
+É possível verificar que as contrações foram expandidas quase na perfeição. Mais uma vez, e como já foi dito anteriormente, a contração \textit{'s} quando atua como símbolo de posse volta a ser um erro complicado de ultrapassar.
+Podemos ver também de seguida os verbos no infinitivo que foram retirados.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=120mm, scale=0.5]{VerbosExample2.png}
+\caption{\label{fig:change}Excerto da listagem de verbos no Exemplo 2.}
+\end{figure}
+
+Tal como aconteceu anteriormente com o advérbio "explicitly", desta vez o advérbio "just" é apanhado na posição do verbo e, como já referido, perturba a eficácia do processador.
 
 
 \chapter{Conclusão} \label{concl}
