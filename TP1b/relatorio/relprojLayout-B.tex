@@ -15,40 +15,40 @@
 \usepackage{listings}
 %LISTING - GENERAL
 \lstset{
-	basicstyle=\small,
-	numbers=left,
-	numberstyle=\tiny,
-	numbersep=5pt,
-	breaklines=true,
+    basicstyle=\small,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    breaklines=true,
     frame=tB,
-	mathescape=true,
-	escapeinside={(*@}{@*)}
+    mathescape=true,
+    escapeinside={(*@}{@*)}
 }
 %
 %\lstset{ %
-%	language=Java,							% choose the language of the code
-%	basicstyle=\ttfamily\footnotesize,		% the size of the fonts that are used for the code
-%	keywordstyle=\bfseries,					% set the keyword style
-%	%numbers=left,							% where to put the line-numbers
-%	numberstyle=\scriptsize,				% the size of the fonts that are used for the line-numbers
-%	stepnumber=2,							% the step between two line-numbers. If it's 1 each line
-%											% will be numbered
-%	numbersep=5pt,							% how far the line-numbers are from the code
-%	backgroundcolor=\color{white},			% choose the background color. You must add \usepackage{color}
-%	showspaces=false,						% show spaces adding particular underscores
-%	showstringspaces=false,					% underline spaces within strings
-%	showtabs=false,							% show tabs within strings adding particular underscores
-%	frame=none,								% adds a frame around the code
-%	%abovecaptionskip=-.8em,
-%	%belowcaptionskip=.7em,
-%	tabsize=2,								% sets default tabsize to 2 spaces
-%	captionpos=b,							% sets the caption-position to bottom
-%	breaklines=true,						% sets automatic line breaking
-%	breakatwhitespace=false,				% sets if automatic breaks should only happen at whitespace
-%	title=\lstname,							% show the filename of files included with \lstinputlisting;
-%											% also try caption instead of title
-%	escapeinside={\%*}{*)},					% if you want to add a comment within your code
-%	morekeywords={*,...}					% if you want to add more keywords to the set
+%   language=Java,                          % choose the language of the code
+%   basicstyle=\ttfamily\footnotesize,      % the size of the fonts that are used for the code
+%   keywordstyle=\bfseries,                 % set the keyword style
+%   %numbers=left,                          % where to put the line-numbers
+%   numberstyle=\scriptsize,                % the size of the fonts that are used for the line-numbers
+%   stepnumber=2,                           % the step between two line-numbers. If it's 1 each line
+%                                           % will be numbered
+%   numbersep=5pt,                          % how far the line-numbers are from the code
+%   backgroundcolor=\color{white},          % choose the background color. You must add \usepackage{color}
+%   showspaces=false,                       % show spaces adding particular underscores
+%   showstringspaces=false,                 % underline spaces within strings
+%   showtabs=false,                         % show tabs within strings adding particular underscores
+%   frame=none,                             % adds a frame around the code
+%   %abovecaptionskip=-.8em,
+%   %belowcaptionskip=.7em,
+%   tabsize=2,                              % sets default tabsize to 2 spaces
+%   captionpos=b,                           % sets the caption-position to bottom
+%   breaklines=true,                        % sets automatic line breaking
+%   breakatwhitespace=false,                % sets if automatic breaks should only happen at whitespace
+%   title=\lstname,                         % show the filename of files included with \lstinputlisting;
+%                                           % also try caption instead of title
+%   escapeinside={\%*}{*)},                 % if you want to add a comment within your code
+%   morekeywords={*,...}                    % if you want to add more keywords to the set
 %}
 
 \usepackage{xspace}
@@ -142,8 +142,8 @@ int maior = 0;
 (...)
 
 void setLimites(int ano){
-	if (ano < menor || menor == 0) menor = ano;
-	if (ano > maior || maior == 0) maior = ano;
+    if (ano < menor || menor == 0) menor = ano;
+    if (ano > maior || maior == 0) maior = ano;
 }
 \end{verbatim}
 
@@ -162,93 +162,118 @@ O comportamento a adotar em cada entidade depende da etiqueta correspondente. As
 
 (...)
 
-\<ENAMEX\ TYPE=\"CITY\"\> 		{BEGIN(CIDADE);}
-\<ENAMEX\ TYPE=\"COUNTRY\"\> 	{BEGIN(PAIS);}
-\<ENAMEX\ TYPE=\"PERSON\"\> 	{BEGIN(PESSOA);}
-\<TIMEX\ TYPE=\"DATE\"\>		{BEGIN(DATA);}
+\<ENAMEX\ TYPE=\"CITY\"\>       {BEGIN(CIDADE);}
+\<ENAMEX\ TYPE=\"COUNTRY\"\>    {BEGIN(PAIS);}
+\<ENAMEX\ TYPE=\"PERSON\"\>     {BEGIN(PESSOA);}
+\<TIMEX\ TYPE=\"DATE\"\>        {BEGIN(DATA);}
 \end{verbatim}
 
 Desta forma, torna-se mais fácil controlar as regras que são testadas. As regras para cada tipo de nomes próprios são muito idênticas, variando na estrutura de dados em que os dados são inseridos.
 
 \begin{verbatim}
-<CIDADE>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
-											inserir(cidades, chave);}
-<PAIS>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
-											inserir(paises, chave);}
-<PESSOA>{ELEMENTO} 						{	char *chave = strdup(yytext);
-											paragrafo2Espaco(chave);
-											inserir(pessoas, chave);}
+<CIDADE>{ELEMENTO}                      {   char *chave = strdup(yytext);
+                                            paragrafo2Espaco(chave);
+                                            inserir(cidades, chave);}
+<PAIS>{ELEMENTO}                        {   char *chave = strdup(yytext);
+                                            paragrafo2Espaco(chave);
+                                            inserir(paises, chave);}
+<PESSOA>{ELEMENTO}                      {   char *chave = strdup(yytext);
+                                            paragrafo2Espaco(chave);
+                                            inserir(pessoas, chave);}
 \end{verbatim}
 
 O ELEMENTO é uma definição criada na primeira secção. Consiste numa PALAVRA seguida de 0 ou mais conjuntos de espaço/newline e PALAVRA. Por sua vez, uma PALAVRA é uma sequência de uma ou mais LETRA. Por fim, uma LETRA é definida por todas as letras do alfabeto (minúsculas e maiúsculas) e outros caracteres relevantes.
 
 \begin{verbatim}
-LETRA 		[a-zA-Z]|-|\.|ó|ã|ç|à|á|é|ê|ú|í|õ
-PALAVRA 	{LETRA}+
-ELEMENTO 	{PALAVRA}([ \n]{PALAVRA})*
+LETRA       [a-zA-Z]|-|\.|ó|ã|ç|à|á|é|ê|ú|í|õ
+PALAVRA     {LETRA}+
+ELEMENTO    {PALAVRA}([ \n]{PALAVRA})*
 \end{verbatim} 
 
-A função "paragrafo2Espaco" converte os "\n" encontrados, em espaços. 
+A função "paragrafo2Espaco" converte os "\textbackslash n" encontrados, em espaços. 
 A função "inserir" insere um nome próprio com o valor 1 caso ainda não existe na árvore respetiva. Se já existir apenas incrementa o valor correspondente à chave.
 
 \begin{verbatim}
 void paragrafo2Espaco(char *chave){
-	int i, n = strlen(chave);
-	for (i = 0; i < n; i++){
-		if (chave[i] == '\n'){
-			chave[i] = ' ';
-		}
-	}
+    int i, n = strlen(chave);
+    for (i = 0; i < n; i++){
+        if (chave[i] == '\n'){
+            chave[i] = ' ';
+        }
+    }
 }
 
 void inserir(GTree *arvore, char *chave){
-	int *valor = g_tree_lookup(arvore, chave);
-	if (valor != NULL){
-		(*valor)++;
-	}
-	else{
-		valor = malloc(sizeof(int));
-		*valor = 1;
-	}
-	g_tree_insert(arvore, chave, valor);
+    int *valor = g_tree_lookup(arvore, chave);
+    if (valor != NULL){
+        (*valor)++;
+    }
+    else{
+        valor = malloc(sizeof(int));
+        *valor = 1;
+    }
+    g_tree_insert(arvore, chave, valor);
 }
 \end{verbatim} 
 
-
-
 Para o caso das datas, estas podem aparecer em formatos diferentes. Os formatos encontrados foram: \textit{ano}; \textit{dia/mes/ano}; \textit{dia} de \textit{mes}; \textit{mes}. Nos dois últimos casos, o mês aparece escrito por extenso. 
 Qualquer que seja o formato, é necessário guardar o padrão encontrado no array. Esse comportamento é descrito da mesma forma para todos os formatos. No entanto, como os dois primeiros formatos enunciados contêm o ano, usa-se a função "setLimites" (referida anteriormente) para definir os anos mais antigo/recente. 
+Para além disso, uma vez que não é possível saber o número de elementos no array, é necessário um contador para permitir saber o número de elementos inseridos.
 
 \begin{verbatim}
-<DATA>({NUM}[ \n])?{ELEMENTO}			{	char *v = strdup(yytext);
-											paragrafo2Espaco(v);
-											g_ptr_array_add(datas, v);
-											nDatas++;
-											}
-<DATA>{NUM}\/{NUM}\/{NUM}				{	char *v = strdup(yytext);
-											g_ptr_array_add(datas, v);
-											nDatas++;
-											char sep[2] = "/";
-											char *token = strtok(yytext, sep);
-											token = strtok(NULL, sep);
-											token = strtok(NULL, sep);
-											v = strdup(token);
-											int ano = atoi(v);
-											setLimites(ano);}
-<DATA>{NUM} 							{	char *v = strdup(yytext);
-											g_ptr_array_add(datas, v);
-											nDatas++;
-											int ano = atoi(yytext);
-											setLimites(ano);}
+<DATA>({NUM}[ \n])?{ELEMENTO}           {   char *v = strdup(yytext);
+                                            paragrafo2Espaco(v);
+                                            g_ptr_array_add(datas, v);
+                                            nDatas++;
+                                            }
+<DATA>{NUM}\/{NUM}\/{NUM}               {   char *v = strdup(yytext);
+                                            g_ptr_array_add(datas, v);
+                                            nDatas++;
+                                            char sep[2] = "/";
+                                            char *token = strtok(yytext, sep);
+                                            token = strtok(NULL, sep);
+                                            token = strtok(NULL, sep);
+                                            v = strdup(token);
+                                            int ano = atoi(v);
+                                            setLimites(ano);}
+<DATA>{NUM}                             {   char *v = strdup(yytext);
+                                            g_ptr_array_add(datas, v);
+                                            nDatas++;
+                                            int ano = atoi(yytext);
+                                            setLimites(ano);}
 \end{verbatim} 
 
 O NUM consiste numa sequência de um ou mais números.
 
 \begin{verbatim}
-NUM 		[0-9]+
+NUM         [0-9]+
 \end{verbatim}
+
+\section{Resultados ...}
+
+Para a apresentação de resultados, e ignorando o código necessário para gerar as páginas HTML, é necessário iterar pelas estruturas de dados. 
+No caso das datas basta iterar de 0 até ao número de elementos inseridos. Para os nomes próprios, uma vez que estão guardados em árvores, não é possível iterar a partir de indíces. Assim, foi necessário criar uma função que realize as operações desejadas para cada nodo, para que seja usada pela função \verb|g_tree_foreach|. Esta função, para além de receber a chave e o valor respetivo, recebe ainda o ficheiro para onde terá de escrever os dados.
+
+\begin{verbatim}
+int i;
+for(i = 0; i < nDatas; i++) {
+    char *v = g_ptr_array_index(datas, i);
+    /* operações */
+}
+
+------
+
+gboolean printNodo(gpointer key, gpointer value, gpointer data) {
+    /* operações */
+    return FALSE;
+}
+
+(...)
+
+g_tree_foreach(arvore, (GTraverseFunc)printNodo, f);
+
+\end{verbatim}
+
 
 \chapter{Apresentação das Queries e Resoluções - TEMA1}
 
@@ -294,8 +319,13 @@ Neste capítulo serão apresentados exemplos de utilização.
 
 \section{Execução}
 
+A execução do programa é feita da seguinte forma:
 
+\begin{verbatim}
+./entidades ficheiro.xml
+\end{verbatim}
 
+O programa abre automaticamente o menu principal realtivo ao ENAMEX no browser firefox. Se este browser não estiver instalado terá de se abrir o ficheiro Enamex.html que é criado na pasta layout com o browser pretendido.
 
 \section{Exemplos}
 
@@ -307,7 +337,9 @@ Abrindo o menu principal aparece o seguinte resultado:
 %\caption{\label{fig:change}Menu Principal.}
 %\end{figure}
 
-Utilizando o menu de navegação superior para clicar em Cliente, obtem-se a página relativa aos dados do cliente. A partir do menu lateral, na secção de Consultas, é possível consultar as queries realizadas.
+Utilizando o menu de navegação superior para clicar em TIMEX, obtem-se a página relativa às datas. 
+Estando na página relativa aos nomes próprios é possível consultar, a partir do menu lateral, os dados relativos às pessoas, cidades ou países.
+Da mesma forma, é possível consultar os limites e as datas estando na página relativa às datas.
 
 %\begin{figure}[h]
 %\centering
@@ -426,10 +458,10 @@ Neste capítulo serão apresentados exemplos de utilização.
 A conversão de inglês corrente envolve as seguintes etapas:
 
 \begin{enumerate}
-	\item Colar o texto a converter na caixa de texto;
-	\item Confirmar o armazenamento num ficheiro;
-	\item Correr o programa FLex;
-	\item Ver resultados.
+    \item Colar o texto a converter na caixa de texto;
+    \item Confirmar o armazenamento num ficheiro;
+    \item Correr o programa FLex;
+    \item Ver resultados.
 \end{enumerate}
 
 \section{Exemplos}
@@ -437,15 +469,15 @@ A conversão de inglês corrente envolve as seguintes etapas:
 Agora apresentar-se-ão os resultados da aplicação quando recebeu como \textit{input} os seguintes textos:
 
 \begin{enumerate}
-	\item FAQ-Python-En.txt, fornecido pela equipa docente aquando do lançamento deste enunciado;
-	\item OUTRO
+    \item FAQ-Python-En.txt, fornecido pela equipa docente aquando do lançamento deste enunciado;
+    \item OUTRO
 \end{enumerate}
 
 Relativamente ao primeiro caso, a quantidade de contrações é reduzida apesar do tamanho do texto. O processador alcança bons resultados, quer nos verbos listados quer no texto sem contrações, no entanto sobressaem dois erros recorrentes:
 
 \begin{enumerate}
-	\item a colocação por extenso da contração \textit{'s} quando esta atua enquanto símbolo de posse (\textit{possessive 's}). Este é o tipo de erro difícil de combater, visto que \textit{'s} pode ser usado como contração de \textit{is} ou \textit{has}, mas também no contexto de posse (\textit{Anthony's house is red.});
-	\item a inclusão de advérbios na listagem de verbos, resultante de frases do género de \textit{He has to seriously consider it!}, onde o advérbio toma a posição do verbo, isto é, a seguir ao \textit{to}, perturbando a eficácia do processador.
+    \item a colocação por extenso da contração \textit{'s} quando esta atua enquanto símbolo de posse (\textit{possessive 's}). Este é o tipo de erro difícil de combater, visto que \textit{'s} pode ser usado como contração de \textit{is} ou \textit{has}, mas também no contexto de posse (\textit{Anthony's house is red.});
+    \item a inclusão de advérbios na listagem de verbos, resultante de frases do género de \textit{He has to seriously consider it!}, onde o advérbio toma a posição do verbo, isto é, a seguir ao \textit{to}, perturbando a eficácia do processador.
 \end{enumerate} 
 
 \begin{figure}[h]
