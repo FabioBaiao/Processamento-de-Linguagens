@@ -4,6 +4,7 @@
 
 	void yyerror(char*);
 	int yylex();
+	void adicionarArray(char*, int);
 	void adicionarVariavel(char*);
 	int contemVariavel(char*);
 
@@ -16,7 +17,7 @@
 %union{int n; char *v;}
 
 %type<v> var
-%type<n> num Valor Var Atom
+%type<n> num Var 
 
 %%
 
@@ -28,7 +29,7 @@ Decls: Decl ',' Decls
 	 ;
 
 Decl: var 						  {adicionarVariavel($1); printf("\tpushi 0\n");}
-	| var '[' num ']'			  {adicionarVariavel($1);}
+	| var '[' num ']'			  {adicionarArray($1, $3); printf("\tpushn %d\n", $3);}
 	| var '[' num ']' '[' num ']' {adicionarVariavel($1);}
 	;
 
@@ -43,14 +44,17 @@ Instr: Atrib
 	 | Ciclo
 	 ;
 
-Atrib: Var '=' Valor ';' {printf("\tstoreg %d\n", $1);}
-	 | Var '=' Oper ';'  {printf("\tstoreg %d\n", $1);}
+Atrib: Var '=' Valor ';'   {printf("\tstoreg %d\n", $1);}
+	 | Var '=' Oper ';'    {printf("\tstoreg %d\n", $1);}
+	 | Array '=' Valor ';' {printf("\tstoren\n");}
+	 | Array '=' Oper ';'  {printf("\tstoren\n");}
 	 ;
 
 Print: PRINT ':' Valor ';' {printf("\twritei\n");}
 	 ;
 
 Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
+	| READ ':' Array ';' {printf("\tread\n\tatoi\n\tstoren\n");}
 	;
 
 CondS: IF '(' Cond ')' '{' Instrs '}'
@@ -75,18 +79,19 @@ Cond: Valor '=' '=' Valor
 	| Valor '>' Valor
 	;
 
-Valor: Var {printf("\tpushg %d\n", $1);}
-	 | num {printf("\tpushi %d\n", $1);}
+Valor: Atom
+	 | Array {printf("\tloadn\n");}
 	 ;
 
-Var: var 						   {$$ = contemVariavel($1);}
-   | var '[' Atom ']' 			   {$$ = contemVariavel($1);}
-   | var '[' Atom ']' '[' Atom ']' {$$ = contemVariavel($1);}
-   ;
+Array: Var {printf("\tpushgp\n\tpushi %d\n\tpadd\n", $1);} '[' Atom ']'
+	 ;
 
-Atom: var {$$ = contemVariavel($1);}
-	| num
+Atom: Var {printf("\tpushg %d\n", $1);}
+	| num {printf("\tpushi %d\n", $1);}
 	;
+
+Var: var {$$ = contemVariavel($1);}
+   ;
 
 %%
 #include "lex.yy.c"
@@ -98,6 +103,15 @@ int contemVariavel(char *variavel){
 		return -1;
 	}
 	return *posicao;
+}
+
+void adicionarArray(char *variavel, int n){
+	int *posicao = malloc(sizeof(int));
+	*posicao = p;
+	if(!g_hash_table_insert(vars, variavel, posicao)){
+		yyerror(variavel);
+	}
+	p+=n;
 }
 
 void adicionarVariavel(char *variavel){
