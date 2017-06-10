@@ -1,9 +1,20 @@
 %{
+	#include <glib.h>
+
 	void yyerror(char*);
 	int yylex();
+	void adicionarVariavel(char*);
+	void contemVariavel(char*);
+
+	GHashTable *vars;
 %}
 
 %token DECLS INSTRS var num PRINT READ IF ELSE WHILE
+
+%union{int n; char *v;}
+
+%type<v> var
+%type<n> num
 
 %%
 
@@ -14,9 +25,9 @@ Decls: Decls ',' Decl
 	 | Decl 
 	 ;
 
-Decl: var
-	| var '[' num ']'
-	| var '[' num ']' '[' num ']'
+Decl: var 						  {adicionarVariavel($1);}
+	| var '[' num ']'			  {adicionarVariavel($1);}
+	| var '[' num ']' '[' num ']' {adicionarVariavel($1);}
 	;
 
 Instrs: Instrs Instr
@@ -26,7 +37,7 @@ Instrs: Instrs Instr
 Instr: Atrib
 	 | Print
 	 | Read
-	 | Cond
+	 | CondS
 	 | Ciclo
 	 ;
 
@@ -40,11 +51,11 @@ Print: PRINT ':' Valor ';'
 Read: READ ':' Valor ';'
 	;
 
-Cond: IF '(' DefinirNomeSugestivo ')' '{' Instrs '}'
-	| IF '(' DefinirNomeSugestivo ')' '{' Instrs '}' ELSE '{' Instrs '}'
-	;
+CondS: IF '(' Cond ')' '{' Instrs '}'
+	 | IF '(' Cond ')' '{' Instrs '}' ELSE '{' Instrs '}'
+	 ;
 
-Ciclo: WHILE '(' DefinirNomeSugestivo ')' '{' Instrs '}'
+Ciclo: WHILE '(' Cond ')' '{' Instrs '}'
 	 ;
 
 Oper: Valor '+' Valor
@@ -54,28 +65,41 @@ Oper: Valor '+' Valor
 	| Valor '%' Valor
 	;
 
-DefinirNomeSugestivo: Valor '=' '=' Valor
-					| Valor '!' '=' Valor
-					| Valor '<' '=' Valor
-					| Valor '>' '=' Valor
-					| Valor '<' Valor
-					| Valor '>' Valor
-					;
+Cond: Valor '=' '=' Valor
+	| Valor '!' '=' Valor
+	| Valor '<' '=' Valor
+	| Valor '>' '=' Valor
+	| Valor '<' Valor
+	| Valor '>' Valor
+	;
 
 Valor: Var
 	 | num
 	 ;
 
-Var: var
-   | var '[' Atom ']'
-   | var '[' Atom ']' '[' Atom ']'
+Var: var 						   {contemVariavel($1);}
+   | var '[' Atom ']' 			   {contemVariavel($1);}
+   | var '[' Atom ']' '[' Atom ']' {contemVariavel($1);}
    ;
 
-Atom: var
+Atom: var {contemVariavel($1);}
 	| num
 	;
+
 %%
 #include "lex.yy.c"
+
+void contemVariavel(char *variavel){
+	if(!g_hash_table_contains(vars, variavel)){
+		yyerror(variavel);
+	}
+}
+
+void adicionarVariavel(char *variavel){
+	if(!g_hash_table_insert(vars, variavel, NULL)){
+		yyerror(variavel);
+	}
+}
 
 void yyerror(char *s){
 	fprintf(stderr, "%d: %s\n\t%s\n", yylineno, yytext, s);
@@ -85,6 +109,7 @@ int main(int argc, char* argv[]){
 	if(argc == 2){
 		yyin = fopen(argv[1], "r");
 	}
+	vars = g_hash_table_new(g_str_hash, g_str_equal);
 	yyparse();
 	return 0;
 }

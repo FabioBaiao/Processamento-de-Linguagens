@@ -10,8 +10,8 @@ IF 						  {return IF;}
 ELSE 					  {return ELSE;}
 WHILE					  {return WHILE;}
 [,=;:(){}+*/%!<>]|\[|\]|- {return yytext[0];}
-[a-z]+ 					  {return var;}
-[0-9]+ 				 	  {return num;}
+[a-z]+ 					  {yylval.v = strdup(yytext); return var;}
+[0-9]+ 				 	  {yylval.n = atoi(yytext); return num;}
 
 [ \n\t] 				  {}
 

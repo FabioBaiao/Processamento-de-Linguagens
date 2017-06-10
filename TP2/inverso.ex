@@ -1,5 +1,5 @@
 DECLS
-a[20]
+a[20], i
 INSTRS
 i = 0;
 WHILE(i < 20){
