@@ -86,12 +86,12 @@ Oper: Valor '+' Valor {printf("\tadd\n");}
 	| Valor '%' Valor {printf("\tmod\n");}
 	;
 
-Cond: Valor '=' '=' Valor
-	| Valor '!' '=' Valor
-	| Valor '<' '=' Valor
-	| Valor '>' '=' Valor
-	| Valor '<' Valor
-	| Valor '>' Valor
+Cond: Valor '=' '=' Valor                   { printf("\tequal\n"); }
+	| Valor '!' '=' Valor                   { printf("\tequal\n\tnot\n"); }
+	| Valor '<' '=' Valor                   { printf("\tinfeq\n"); }
+	| Valor '>' '=' Valor                   { printf("\tsupeq\n"); }
+	| Valor '<' Valor                       { printf("\tinf\n"); }
+	| Valor '>' Valor                       { printf("\tsup\n"); }
 	;
 
 Valor: Atom
