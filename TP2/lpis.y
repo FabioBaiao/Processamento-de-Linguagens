@@ -47,10 +47,11 @@ Atrib: Var '=' Valor ';'
 	 | Var '=' Oper ';'
 	 ;
 
-Print: PRINT ':' Valor ';' {printf("\tpushg %d\n\twritei\n", $3);}
+Print: PRINT ':' Var ';' {printf("\tpushg %d\n\twritei\n", $3);}
+	 | PRINT ':' Num ';' {printf("\twritei\n");}
 	 ;
 
-Read: READ ':' Valor ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
+Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
 	;
 
 CondS: IF '(' Cond ')' '{' Instrs '}'
@@ -87,6 +88,9 @@ Var: var 						   {$$ = contemVariavel($1);}
 Atom: var {$$ = contemVariavel($1);}
 	| num
 	;
+
+Num: num {printf("\tpushi %d\n", $1);} 
+   ;
 
 %%
 #include "lex.yy.c"
