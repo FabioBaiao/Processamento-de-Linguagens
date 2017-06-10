@@ -43,12 +43,11 @@ Instr: Atrib
 	 | Ciclo
 	 ;
 
-Atrib: Var '=' Valor ';'
-	 | Var '=' Oper ';'
+Atrib: Var '=' Valor ';' {printf("\tstoreg %d\n", $1);}
+	 | Var '=' Oper ';'  {printf("\tstoreg %d\n", $1);}
 	 ;
 
-Print: PRINT ':' Var ';' {printf("\tpushg %d\n\twritei\n", $3);}
-	 | PRINT ':' Num ';' {printf("\twritei\n");}
+Print: PRINT ':' Valor ';' {printf("\twritei\n");}
 	 ;
 
 Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
@@ -61,11 +60,11 @@ CondS: IF '(' Cond ')' '{' Instrs '}'
 Ciclo: WHILE '(' Cond ')' '{' Instrs '}'
 	 ;
 
-Oper: Valor '+' Valor
-	| Valor '-' Valor
-	| Valor '*' Valor
-	| Valor '/' Valor
-	| Valor '%' Valor
+Oper: Valor '+' Valor {printf("\tadd\n");}
+	| Valor '-' Valor {printf("\tsub\n");}
+	| Valor '*' Valor {printf("\tmul\n");}
+	| Valor '/' Valor {printf("\tdiv\n");}
+	| Valor '%' Valor {printf("\tmod\n");}
 	;
 
 Cond: Valor '=' '=' Valor
@@ -76,8 +75,8 @@ Cond: Valor '=' '=' Valor
 	| Valor '>' Valor
 	;
 
-Valor: Var {$$ = $1;}
-	 | num
+Valor: Var {printf("\tpushg %d\n", $1);}
+	 | num {printf("\tpushi %d\n", $1);}
 	 ;
 
 Var: var 						   {$$ = contemVariavel($1);}
@@ -88,9 +87,6 @@ Var: var 						   {$$ = contemVariavel($1);}
 Atom: var {$$ = contemVariavel($1);}
 	| num
 	;
-
-Num: num {printf("\tpushi %d\n", $1);} 
-   ;
 
 %%
 #include "lex.yy.c"
