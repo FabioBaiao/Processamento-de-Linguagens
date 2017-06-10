@@ -7,12 +7,22 @@
 	void adicionarMatriz(char*, int, int);
 	void adicionarArray(char*, int);
 	void adicionarVariavel(char*);
-	struct dadosVar contemVariavel(char*);
+	
 
 	GHashTable *vars;
 	int p;
 
 	struct dadosVar{int pos, l;};
+
+	struct dadosVar contemVariavel(char*);
+
+	typedef struct stack{
+		int v;
+		struct stack *prox;
+	} *Stack;
+
+	Stack push(Stack, int);
+	Stack pop(Stack, int*);
 %}
 
 %token DECLS INSTRS var num PRINT READ IF ELSE WHILE
@@ -103,6 +113,20 @@ Var: var {$$ = contemVariavel($1);}
 
 %%
 #include "lex.yy.c"
+
+Stack push (Stack t, int h){
+	Stack s = malloc(sizeof(struct stack));
+	s->v = h;
+	s->prox = t;
+	return s;
+}
+
+Stack pop (Stack s, int *h){
+	*h = s->v;
+	Stack t = s->prox;
+	free(s);
+	return t;
+}
 
 struct dadosVar contemVariavel(char *variavel){
 	struct dadosVar *posicao = g_hash_table_lookup(vars, variavel);
