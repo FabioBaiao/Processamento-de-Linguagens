@@ -10,7 +10,8 @@
 	
 
 	GHashTable *vars;
-	int p;
+	Stack s;
+	int p, nIfs = 0;
 
 	struct dadosVar{int pos, l;};
 
@@ -71,8 +72,8 @@ Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3.pos);}
 	| READ ':' Array ';' {printf("\tread\n\tatoi\n\tstoren\n");}
 	;
 
-CondS: IF '(' Cond ')' '{' Instrs '}'
-	 | IF '(' Cond ')' '{' Instrs '}' ELSE '{' Instrs '}'
+CondS: IF { nIfs++; push(&s, nIfs); } '(' Cond ')' { printf("\tjz label%d\n", nIfs); } '{' Instrs '}' { n = pop(&s); printf("label%d:\n", n); }
+	 | IF { nIfs++; push(&s, nIfs); } '(' Cond ')' { printf("\tjz label%d\n", nIfs); } '{' Instrs '}' ELSE { nIfs++; printf("\tjz label%d\n", nIfs); } '{' Instrs '}' { n = pop(&s); printf("label%d:\n", n); }
 	 ;
 
 Ciclo: WHILE '(' Cond ')' '{' Instrs '}'
@@ -114,14 +115,13 @@ Var: var {$$ = contemVariavel($1);}
 %%
 #include "lex.yy.c"
 
-Stack push (Stack t, int h){
+void push (Stack *t, int h){
 	Stack s = malloc(sizeof(struct stack));
 	s->v = h;
 	s->prox = t;
-	return s;
 }
 
-Stack pop (Stack s, int *h){
+int pop (Stack *s){
 	*h = s->v;
 	Stack t = s->prox;
 	free(s);
@@ -175,6 +175,7 @@ int main(int argc, char* argv[]){
 	}
 	vars = g_hash_table_new(g_str_hash, g_str_equal);
 	p = 0;
+	s = null;
 	yyparse();
 	return 0;
 }
