@@ -4,20 +4,24 @@
 
 	void yyerror(char*);
 	int yylex();
+	void adicionarMatriz(char*, int, int);
 	void adicionarArray(char*, int);
 	void adicionarVariavel(char*);
-	int contemVariavel(char*);
+	struct dadosVar contemVariavel(char*);
 
 	GHashTable *vars;
 	int p;
+
+	struct dadosVar{int pos, l;};
 %}
 
 %token DECLS INSTRS var num PRINT READ IF ELSE WHILE
 
-%union{int n; char *v;}
+%union{int n; char *v; struct dadosVar d;}
 
 %type<v> var
-%type<n> num Var 
+%type<n> num
+%type<d> Var Cabeca
 
 %%
 
@@ -30,7 +34,7 @@ Decls: Decl ',' Decls
 
 Decl: var 						  {adicionarVariavel($1); printf("\tpushi 0\n");}
 	| var '[' num ']'			  {adicionarArray($1, $3); printf("\tpushn %d\n", $3);}
-	| var '[' num ']' '[' num ']' {adicionarVariavel($1);}
+	| var '[' num ']' '[' num ']' {adicionarMatriz($1, $3, $6); printf("\tpushn %d\n", $3*$6);}
 	;
 
 Instrs: Instrs Instr
@@ -44,8 +48,8 @@ Instr: Atrib
 	 | Ciclo
 	 ;
 
-Atrib: Var '=' Valor ';'   {printf("\tstoreg %d\n", $1);}
-	 | Var '=' Oper ';'    {printf("\tstoreg %d\n", $1);}
+Atrib: Var '=' Valor ';'   {printf("\tstoreg %d\n", $1.pos);}
+	 | Var '=' Oper ';'    {printf("\tstoreg %d\n", $1.pos);}
 	 | Array '=' Valor ';' {printf("\tstoren\n");}
 	 | Array '=' Oper ';'  {printf("\tstoren\n");}
 	 ;
@@ -53,7 +57,7 @@ Atrib: Var '=' Valor ';'   {printf("\tstoreg %d\n", $1);}
 Print: PRINT ':' Valor ';' {printf("\twritei\n");}
 	 ;
 
-Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
+Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3.pos);}
 	| READ ':' Array ';' {printf("\tread\n\tatoi\n\tstoren\n");}
 	;
 
@@ -83,10 +87,14 @@ Valor: Atom
 	 | Array {printf("\tloadn\n");}
 	 ;
 
-Array: Var {printf("\tpushgp\n\tpushi %d\n\tpadd\n", $1);} '[' Atom ']'
+Array: Cabeca
+	 | Cabeca {printf("\tpushi %d\n\tmul\n", $1.l);} '[' Atom ']' {printf("\tadd\n");}
 	 ;
 
-Atom: Var {printf("\tpushg %d\n", $1);}
+Cabeca: Var {printf("\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']' {$$ = $1;}
+	  ;
+
+Atom: Var {printf("\tpushg %d\n", $1.pos);}
 	| num {printf("\tpushi %d\n", $1);}
 	;
 
@@ -96,18 +104,28 @@ Var: var {$$ = contemVariavel($1);}
 %%
 #include "lex.yy.c"
 
-int contemVariavel(char *variavel){
-	int *posicao = g_hash_table_lookup(vars, variavel);
+struct dadosVar contemVariavel(char *variavel){
+	struct dadosVar *posicao = g_hash_table_lookup(vars, variavel);
 	if(!posicao){
 		yyerror(variavel);
-		return -1;
+		return *posicao;
 	}
 	return *posicao;
 }
 
+void adicionarMatriz(char *variavel, int n, int m){
+	struct dadosVar *posicao = malloc(sizeof(struct dadosVar));
+	posicao->pos = p;
+	posicao->l = m;
+	if(!g_hash_table_insert(vars, variavel, posicao)){
+		yyerror(variavel);
+	}
+	p+=n*m;
+}
+
 void adicionarArray(char *variavel, int n){
-	int *posicao = malloc(sizeof(int));
-	*posicao = p;
+	struct dadosVar *posicao = malloc(sizeof(struct dadosVar));
+	posicao->pos = p;
 	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
 	}
@@ -115,8 +133,8 @@ void adicionarArray(char *variavel, int n){
 }
 
 void adicionarVariavel(char *variavel){
-	int *posicao = malloc(sizeof(int));
-	*posicao = p;
+	struct dadosVar *posicao = malloc(sizeof(struct dadosVar));
+	posicao->pos = p;
 	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
 	}
