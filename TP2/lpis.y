@@ -1,12 +1,14 @@
 %{
 	#include <glib.h>
+	#include <stdio.h>
 
 	void yyerror(char*);
 	int yylex();
 	void adicionarVariavel(char*);
-	void contemVariavel(char*);
+	int contemVariavel(char*);
 
 	GHashTable *vars;
+	int p;
 %}
 
 %token DECLS INSTRS var num PRINT READ IF ELSE WHILE
@@ -14,18 +16,18 @@
 %union{int n; char *v;}
 
 %type<v> var
-%type<n> num
+%type<n> num Valor Var Atom
 
 %%
 
-Ling: DECLS Decls INSTRS Instrs
+Ling: DECLS Decls INSTRS Instrs {printf("stop\n");}
 	;
 
-Decls: Decls ',' Decl
-	 | Decl 
+Decls: Decl ',' Decls 
+	 | Decl 			{printf("start\n");}
 	 ;
 
-Decl: var 						  {adicionarVariavel($1);}
+Decl: var 						  {adicionarVariavel($1); printf("\tpushi 0\n");}
 	| var '[' num ']'			  {adicionarVariavel($1);}
 	| var '[' num ']' '[' num ']' {adicionarVariavel($1);}
 	;
@@ -45,10 +47,10 @@ Atrib: Var '=' Valor ';'
 	 | Var '=' Oper ';'
 	 ;
 
-Print: PRINT ':' Valor ';'
+Print: PRINT ':' Valor ';' {printf("\tpushg %d\n\twritei\n", $3);}
 	 ;
 
-Read: READ ':' Valor ';'
+Read: READ ':' Valor ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3);}
 	;
 
 CondS: IF '(' Cond ')' '{' Instrs '}'
@@ -73,32 +75,38 @@ Cond: Valor '=' '=' Valor
 	| Valor '>' Valor
 	;
 
-Valor: Var
+Valor: Var {$$ = $1;}
 	 | num
 	 ;
 
-Var: var 						   {contemVariavel($1);}
-   | var '[' Atom ']' 			   {contemVariavel($1);}
-   | var '[' Atom ']' '[' Atom ']' {contemVariavel($1);}
+Var: var 						   {$$ = contemVariavel($1);}
+   | var '[' Atom ']' 			   {$$ = contemVariavel($1);}
+   | var '[' Atom ']' '[' Atom ']' {$$ = contemVariavel($1);}
    ;
 
-Atom: var {contemVariavel($1);}
+Atom: var {$$ = contemVariavel($1);}
 	| num
 	;
 
 %%
 #include "lex.yy.c"
 
-void contemVariavel(char *variavel){
-	if(!g_hash_table_contains(vars, variavel)){
+int contemVariavel(char *variavel){
+	int *posicao = g_hash_table_lookup(vars, variavel);
+	if(!posicao){
 		yyerror(variavel);
+		return -1;
 	}
+	return *posicao;
 }
 
 void adicionarVariavel(char *variavel){
-	if(!g_hash_table_insert(vars, variavel, NULL)){
+	int *posicao = malloc(sizeof(int));
+	*posicao = p;
+	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
 	}
+	p++;
 }
 
 void yyerror(char *s){
@@ -110,6 +118,7 @@ int main(int argc, char* argv[]){
 		yyin = fopen(argv[1], "r");
 	}
 	vars = g_hash_table_new(g_str_hash, g_str_equal);
+	p = 0;
 	yyparse();
 	return 0;
 }
