@@ -114,6 +114,7 @@ ArrCabec: Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom '
 
 Atom: Var {fprintf(f, "\tpushg %d\n", $1.pos);}
 	| num {fprintf(f, "\tpushi %d\n", $1);}
+	| '-' num {fprintf(f, "\t pushi %d\n", -$2);}
 	;
 
 Var: var {$$ = contemVariavel($1);}
@@ -152,6 +153,7 @@ void adicionarMatriz(char *variavel, int n, int m){
 	posicao->tamL = m;
 	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
+		exit(0);
 	}
 	pos+=n*m;
 	fprintf(f, "\tpushn %d\n", n*m);
@@ -162,6 +164,7 @@ void adicionarArray(char *variavel, int n){
 	posicao->pos = pos;
 	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
+		exit(0);
 	}
 	pos+=n;
 	fprintf(f, "\tpushn %d\n", n);
@@ -172,6 +175,7 @@ void adicionarVariavel(char *variavel){
 	posicao->pos = pos;
 	if(!g_hash_table_insert(vars, variavel, posicao)){
 		yyerror(variavel);
+		exit(0);
 	}
 	pos++;
 	fprintf(f, "\tpushi 0\n");

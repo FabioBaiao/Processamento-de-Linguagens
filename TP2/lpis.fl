@@ -11,7 +11,7 @@ ELSE 					    {return ELSE;}
 WHILE					    {return WHILE;}
 [,=;:(){}+*/%!<>?&]|\[|\]|- {return yytext[0];}
 [a-z]+ 					    {yylval.v = strdup(yytext); return var;}
--?[0-9]+ 				    {yylval.n = atoi(yytext); return num;}
+[0-9]+ 					    {yylval.n = atoi(yytext); return num;}
 
 \"([^"]|\\\")*\" 		    {yylval.v = strdup(yytext); return cad;}
 
