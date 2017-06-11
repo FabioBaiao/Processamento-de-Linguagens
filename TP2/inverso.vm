@@ -1,0 +1,49 @@
+	pushn 5
+	pushi 0
+start
+	pushi 0
+	storeg 5
+label0:
+	pushg 5
+	pushi 5
+	inf
+	jz label1
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	read
+	atoi
+	storen
+	pushg 5
+	pushi 1
+	add
+	storeg 5
+	jump label0
+label1:
+	pushi 5
+	pushi 1
+	sub
+	storeg 5
+	pushs "Ordem inversa\n"
+	writes
+label2:
+	pushg 5
+	pushi 0
+	supeq
+	jz label3
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	loadn
+	writei
+	pushs " \n"
+	writes
+	pushg 5
+	pushi 1
+	sub
+	storeg 5
+	jump label2
+label3:
+stop

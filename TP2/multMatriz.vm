@@ -1,0 +1,250 @@
+	pushn 9
+	pushn 9
+	pushn 9
+	pushi 0
+	pushi 0
+	pushi 0
+	pushi 0
+start
+	pushi 0
+	storeg 27
+label0:
+	pushg 27
+	pushi 3
+	inf
+	jz label1
+	pushi 0
+	storeg 28
+label2:
+	pushg 28
+	pushi 3
+	inf
+	jz label3
+	pushgp
+	pushi 0
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	pushg 27
+	pushg 28
+	mul
+	storen
+	pushgp
+	pushi 9
+	padd
+	pushg 28
+	pushi 3
+	mul
+	pushg 27
+	add
+	pushg 27
+	pushg 28
+	add
+	storen
+	pushg 28
+	pushi 1
+	add
+	storeg 28
+	jump label2
+label3:
+	pushg 27
+	pushi 1
+	add
+	storeg 27
+	jump label0
+label1:
+	pushi 0
+	storeg 27
+label4:
+	pushg 27
+	pushi 3
+	inf
+	jz label5
+	pushi 0
+	storeg 28
+label6:
+	pushg 28
+	pushi 3
+	inf
+	jz label7
+	pushi 0
+	storeg 29
+label8:
+	pushg 29
+	pushi 3
+	inf
+	jz label9
+	pushgp
+	pushi 0
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 29
+	add
+	loadn
+	pushgp
+	pushi 9
+	padd
+	pushg 29
+	pushi 3
+	mul
+	pushg 28
+	add
+	loadn
+	mul
+	storeg 30
+	pushgp
+	pushi 18
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	pushgp
+	pushi 18
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	loadn
+	pushg 30
+	add
+	storen
+	pushg 29
+	pushi 1
+	add
+	storeg 29
+	jump label8
+label9:
+	pushg 28
+	pushi 1
+	add
+	storeg 28
+	jump label6
+label7:
+	pushg 27
+	pushi 1
+	add
+	storeg 27
+	jump label4
+label5:
+	pushi 0
+	storeg 27
+label10:
+	pushg 27
+	pushi 3
+	inf
+	jz label11
+	pushi 0
+	storeg 28
+label12:
+	pushg 28
+	pushi 3
+	inf
+	jz label13
+	pushgp
+	pushi 0
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	loadn
+	writei
+	pushs " "
+	writes
+	pushg 28
+	pushi 1
+	add
+	storeg 28
+	jump label12
+label13:
+	pushg 27
+	pushi 1
+	equal
+	jz label14
+	pushs "|*|"
+	writes
+	jump label15
+label14:
+	pushs "| |"
+	writes
+label15:
+	pushi 0
+	storeg 28
+label16:
+	pushg 28
+	pushi 3
+	inf
+	jz label17
+	pushgp
+	pushi 9
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	loadn
+	writei
+	pushs " "
+	writes
+	pushg 28
+	pushi 1
+	add
+	storeg 28
+	jump label16
+label17:
+	pushg 27
+	pushi 1
+	equal
+	jz label18
+	pushs "|=|"
+	writes
+	jump label19
+label18:
+	pushs "| |"
+	writes
+label19:
+	pushi 0
+	storeg 28
+label20:
+	pushg 28
+	pushi 3
+	inf
+	jz label21
+	pushgp
+	pushi 18
+	padd
+	pushg 27
+	pushi 3
+	mul
+	pushg 28
+	add
+	loadn
+	writei
+	pushs " "
+	writes
+	pushg 28
+	pushi 1
+	add
+	storeg 28
+	jump label20
+label21:
+	pushs " \n"
+	writes
+	pushg 27
+	pushi 1
+	add
+	storeg 27
+	jump label10
+label11:
+stop

@@ -1,0 +1,71 @@
+	pushn 10
+	pushi 0
+	pushi 0
+	pushi 0
+start
+	pushi 0
+	storeg 10
+label0:
+	pushg 10
+	pushi 10
+	inf
+	jz label1
+	pushgp
+	pushi 0
+	padd
+	pushg 10
+	pushg 10
+	storen
+	pushg 10
+	pushi 1
+	add
+	storeg 10
+	jump label0
+label1:
+	pushi 0
+	storeg 10
+	pushi 0
+	storeg 11
+label2:
+	pushg 10
+	pushi 10
+	inf
+	jz label3
+	pushgp
+	pushi 0
+	padd
+	pushg 10
+	loadn
+	pushi 2
+	mod
+	storeg 12
+	pushg 12
+	pushi 1
+	equal
+	jz label4
+	pushs "Impar: "
+	writes
+	pushgp
+	pushi 0
+	padd
+	pushg 10
+	loadn
+	writei
+	pushs " \n"
+	writes
+	pushg 11
+	pushi 1
+	add
+	storeg 11
+label4:
+	pushg 10
+	pushi 1
+	add
+	storeg 10
+	jump label2
+label3:
+	pushs "Numero de impares: "
+	writes
+	pushg 11
+	writei
+stop

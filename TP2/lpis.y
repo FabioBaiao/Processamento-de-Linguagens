@@ -112,8 +112,9 @@ Array: ArrCabec
 ArrCabec: Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']' {$$ = $1;}
 		;
 
-Atom: Var {fprintf(f, "\tpushg %d\n", $1.pos);}
-	| num {fprintf(f, "\tpushi %d\n", $1);}
+Atom: Var 	  {fprintf(f, "\tpushg %d\n", $1.pos);}
+	| '-' Var {fprintf(f, "\tpushi -1\n\tpushg %d\n\tmul\n", $2.pos);}
+	| num 	  {fprintf(f, "\tpushi %d\n", $1);}
 	| '-' num {fprintf(f, "\t pushi %d\n", -$2);}
 	;
 
