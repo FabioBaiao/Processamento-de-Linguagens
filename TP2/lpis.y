@@ -11,6 +11,7 @@
 	
 	GHashTable *vars;
 	int pos, label;
+	FILE *f;
 
 	typedef struct{int pos, tamL;} DadosVar;
 	DadosVar contemVariavel(char*);
@@ -34,7 +35,7 @@
 
 %%
 
-Ling: DECLS Decls {printf("start\n");} INSTRS Instrs {printf("stop\n");}
+Ling: DECLS Decls {fprintf(f, "start\n");} INSTRS Instrs {fprintf(f, "stop\n");}
 	;
 
 Decls: Decls ',' Decl 
@@ -57,60 +58,62 @@ Instr: Atrib
 	 | Ciclo
 	 ;
 
-Atrib: Var '=' Valor ';'   {printf("\tstoreg %d\n", $1.pos);}
-	 | Var '=' Oper ';'    {printf("\tstoreg %d\n", $1.pos);}
-	 | Array '=' Valor ';' {printf("\tstoren\n");}
-	 | Array '=' Oper ';'  {printf("\tstoren\n");}
+Atrib: Var '=' Valor ';'   {fprintf(f, "\tstoreg %d\n", $1.pos);}
+	 | Var '=' Oper ';'    {fprintf(f, "\tstoreg %d\n", $1.pos);}
+	 | Var '=' Cond ';'    {fprintf(f, "\tstoreg %d\n", $1.pos);}
+	 | Array '=' Valor ';' {fprintf(f, "\tstoren\n");}
+	 | Array '=' Oper ';'  {fprintf(f, "\tstoren\n");}
+	 | Array '=' Cond ';'  {fprintf(f, "\tstoren\n");}
+	 | Var '=' '(' Cond {fprintf(f, "\tjz label%d\n", label++);} '?' Valor {fprintf(f, "\tstoreg %d\n\tjump label%d\nlabel%d:\n", $1.pos, label++, label-1);} ':' Valor ')' ';' {fprintf(f, "\tstoreg %d\nlabel%d:\n", $1.pos, label-1);}
 	 ;
 
-Print: PRINT ':' Valor ';' {printf("\twritei\n");}
-	 | PRINT ':' cad ';' {printf("\tpushs %s\n\twrites\n", $3);}
+Print: PRINT ':' Valor ';' {fprintf(f, "\twritei\n");}
+	 | PRINT ':' cad ';' {fprintf(f, "\tpushs %s\n\twrites\n", $3);}
 	 ;
 
-Read: READ ':' Var ';' {printf("\tread\n\tatoi\n\tstoreg %d\n", $3.pos);}
-	| READ ':' Array ';' {printf("\tread\n\tatoi\n\tstoren\n");}
+Read: READ ':' Var ';' {fprintf(f, "\tread\n\tatoi\n\tstoreg %d\n", $3.pos);}
+	| READ ':' Array ';' {fprintf(f, "\tread\n\tatoi\n\tstoren\n");}
 	;
 
-CondS: IfCond { printf("label%d:\n", pop()); }
-	 | IfCond ELSE { printf("\tjump label%d\n", label); printf("label%d:\n", pop()); push(); } '{' Instrs '}' { printf("label%d:\n", pop()); }
+CondS: IfCond { fprintf(f, "label%d:\n", pop()); }
+	 | IfCond ELSE { fprintf(f, "\tjump label%d\n", label); fprintf(f, "label%d:\n", pop()); push(); } '{' Instrs '}' { fprintf(f, "label%d:\n", pop()); }
 	 ;
 
-IfCond: IF '(' Cond ')' { printf("\tjz label%d\n", label); push(); } '{' Instrs '}'
+IfCond: IF '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); } '{' Instrs '}'
 	  ;
 
-Ciclo: WHILE { printf("label%d:\n", label); push(); } '(' Cond ')' { printf("\tjz label%d\n", label); push(); } '{' Instrs '}' { int lab = pop(); printf("\tjump label%d\n", pop()); printf("label%d:\n", lab);}
+Ciclo: WHILE { fprintf(f, "label%d:\n", label); push(); } '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); } '{' Instrs '}' { int lab = pop(); fprintf(f, "\tjump label%d\n", pop()); fprintf(f, "label%d:\n", lab);}
 	 ;
 
-Oper: Valor '+' Valor {printf("\tadd\n");}
-	| Valor '-' Valor {printf("\tsub\n");}
-	| Valor '*' Valor {printf("\tmul\n");}
-	| Valor '/' Valor {printf("\tdiv\n");}
-	| Valor '%' Valor {printf("\tmod\n");}
+Oper: Valor '+' Valor {fprintf(f, "\tadd\n");}
+	| Valor '-' Valor {fprintf(f, "\tsub\n");}
+	| Valor '*' Valor {fprintf(f, "\tmul\n");}
+	| Valor '/' Valor {fprintf(f, "\tdiv\n");}
+	| Valor '%' Valor {fprintf(f, "\tmod\n");}
 	;
 
-Cond: Valor '=' '=' Valor  { printf("\tequal\n"); }
-	| Valor '!' '=' Valor  { printf("\tequal\n\tnot\n"); }
-	| Valor '<' '=' Valor  { printf("\tinfeq\n"); }
-	| Valor '>' '=' Valor  { printf("\tsupeq\n"); }
-	| Valor '<' Valor      { printf("\tinf\n"); }
-	| Valor '>' Valor      { printf("\tsup\n"); }
-	| Valor '&' '&' Valor     { printf("\tmul\n\tnot\n");}
-	| Valor '|' '|' Valor     { }
+Cond: Valor '=' '=' Valor  { fprintf(f, "\tequal\n"); }
+	| Valor '!' '=' Valor  { fprintf(f, "\tequal\n\tnot\n"); }
+	| Valor '<' '=' Valor  { fprintf(f, "\tinfeq\n"); }
+	| Valor '>' '=' Valor  { fprintf(f, "\tsupeq\n"); }
+	| Valor '<' Valor      { fprintf(f, "\tinf\n"); }
+	| Valor '>' Valor      { fprintf(f, "\tsup\n"); }
+	| Valor '&' '&' Valor  { fprintf(f, "\tmul\n");}
 	;
 
 Valor: Atom
-	 | Array {printf("\tloadn\n");}
+	 | Array {fprintf(f, "\tloadn\n");}
 	 ;
 
 Array: ArrCabec
-	 | ArrCabec {printf("\tpushi %d\n\tmul\n", $1.tamL);} '[' Atom ']' {printf("\tadd\n");}
+	 | ArrCabec {fprintf(f, "\tpushi %d\n\tmul\n", $1.tamL);} '[' Atom ']' {fprintf(f, "\tadd\n");}
 	 ;
 
-ArrCabec: Var {printf("\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']' {$$ = $1;}
+ArrCabec: Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']' {$$ = $1;}
 		;
 
-Atom: Var {printf("\tpushg %d\n", $1.pos);}
-	| num {printf("\tpushi %d\n", $1);}
+Atom: Var {fprintf(f, "\tpushg %d\n", $1.pos);}
+	| num {fprintf(f, "\tpushi %d\n", $1);}
 	;
 
 Var: var {$$ = contemVariavel($1);}
@@ -151,7 +154,7 @@ void adicionarMatriz(char *variavel, int n, int m){
 		yyerror(variavel);
 	}
 	pos+=n*m;
-	printf("\tpushn %d\n", n*m);
+	fprintf(f, "\tpushn %d\n", n*m);
 }
 
 void adicionarArray(char *variavel, int n){
@@ -161,7 +164,7 @@ void adicionarArray(char *variavel, int n){
 		yyerror(variavel);
 	}
 	pos+=n;
-	printf("\tpushn %d\n", n);
+	fprintf(f, "\tpushn %d\n", n);
 }
 
 void adicionarVariavel(char *variavel){
@@ -171,7 +174,7 @@ void adicionarVariavel(char *variavel){
 		yyerror(variavel);
 	}
 	pos++;
-	printf("\tpushi 0\n");
+	fprintf(f, "\tpushi 0\n");
 }
 
 void yyerror(char *s){
@@ -179,12 +182,13 @@ void yyerror(char *s){
 }
 
 int main(int argc, char* argv[]){
+	f = stdout;
 	if(argc == 2){
 		yyin = fopen(argv[1], "r");
 	}
-	if (argc == 3){
+	else if (argc == 3){
 		yyin = fopen(argv[1], "r");
-		yyout = fopen(argv[2], "w");
+		f = fopen(argv[2], "w");
 	}
 	vars = g_hash_table_new(g_str_hash, g_str_equal);
 	pos = 0;
