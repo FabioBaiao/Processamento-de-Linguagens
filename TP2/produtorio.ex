@@ -8,4 +8,5 @@ WHILE(n > 0){
 	p = p * v;
 	n = n - 1;
 }
+PRINT: "Produtorio: ";
 PRINT: p;

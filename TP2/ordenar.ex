@@ -1,17 +1,17 @@
 DECLS
-a[20], i, v, aux
+a[5], i, v, aux, j, m
 INSTRS
 i = 0;
-WHILE(i < 20){
+WHILE(i < 5){
 	READ: v;
 	a[i] = v;
 	i = i + 1;
 }
 i = 0;
-WHILE (i < 20){
+WHILE (i < 5){
 	j = i + 1;
 	m = i;
-	WHILE(j < 20){
+	WHILE(j < 5){
 		IF(a[j] > a[m]){
 			m = j;
 		}
@@ -23,6 +23,9 @@ WHILE (i < 20){
 	i = i + 1;
 }
 i = 0;
-WHILE(i < 20){
+PRINT: "Ordem descrescente\n";
+WHILE(i < 5){
 	PRINT: a[i];
+	PRINT: " \n";
+	i = i + 1;
 }

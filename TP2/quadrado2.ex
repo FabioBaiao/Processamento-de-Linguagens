@@ -5,12 +5,12 @@ READ: x;
 i = 0;
 WHILE (i < 3){
 	READ: y;
-	IF (y != x){
-		PRINT: "Nao é quadrado!";
-		i = 4;
+	IF (y == x){
+		i = i + 1;
 	}
 	ELSE{
-		i = i + 1;
+		PRINT: "Nao é quadrado!";
+		i = 4;
 	}
 }
 IF (i == 3){

@@ -1,10 +1,5 @@
 DECLS
-i, j
+i
 INSTRS
-READ: j;
-READ: i;
-PRINT: i;
-PRINT: j;
-IF (i == j) {
-	PRINT: i;
-}
+PRINT: "Hello World\n";
+PRINT: "Goodbye World\n";
