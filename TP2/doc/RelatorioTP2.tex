@@ -110,7 +110,25 @@ Para que seja possível incluir instruções aninhadas, construiu-se uma stack (
 Desta forma, no caso de uma instrução condicional coloca-se a instrução "jz labelI1" imediatamente depois de testar a condição, sendo I1 a variável global que contem o número da label, e coloca-se I1 na stack, incrementando-a.\\
 Se não existir bloco ELSE coloca-se a instrução "labelI1:" depois de executar o bloco, sendo I o valor que está na cabeça da stack, retirando-o.\\
 Caso haja um bloco ELSE inclui-se as instruções "jump labelI2" e "labelI1" a seguir ao bloco do IF e antes do bloco de instruções do ELSE, sendo I1 obtido da stack e I2 a variável global (como sempre esta variável é incrementada depois de colocada na stack). No final do bloco ELSE coloca-se a instrução "labelI2:" sendo I2 obtido da stack.
-\item Nas instruções ciclicas, coloca-se a instrução "labelI1:" antes de testar a condição, sendo o I1 o valor obtido da variável global (sendo colocada na stack e incrementada de seguida). Imediatamente depois de calcular a condição de paragem é colocada a instrução "jz labelI2" (mais uma vez é colocada na stack e incrementada). No final das instruções pertencentes ao bloco WHILE são adicionadas as instruções "jump labelI1" e "labelI2:", onde I1 e I2 são obtidos da stack.
+Nas instruções ciclicas, coloca-se a instrução "labelI1:" antes de testar a condição, sendo o I1 o valor obtido da variável global (sendo colocada na stack e incrementada de seguida). Imediatamente depois de calcular a condição de paragem é colocada a instrução "jz labelI2" (mais uma vez é colocada na stack e incrementada). No final das instruções pertencentes ao bloco WHILE são adicionadas as instruções "jump labelI1" e "labelI2:", onde I1 e I2 são obtidos da stack.
+\\ 
+\textbf{NOTAS:}\\
+Nas produções relativas aos não terminais CondS e Array numa primeira abordagem colocou-se as seguintes produções:
+\begin{verbatim}
+CondS: IF '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); }
+	   '{' Instrs '}' { fprintf(f, "label%d:\n", pop()); }
+
+     | IF '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); }
+       '{' Instrs '}' ELSE { fprintf(f, "\tjump label%d\n", label);
+     			  		     fprintf(f, "label%d:\n", pop()); 
+   						     push(); } '{' Instrs '}' { fprintf(f, "label%d:\n", pop()); }
+
+Array: Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']'
+
+     | Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']'
+           { fprintf(f, "\tpushi %d\n\tmul\n", $1.tamL);} '[' Atom ']' {fprintf(f, "\tadd\n"); }
+\end{verbatim}
+Uma vez que esta abordagem gerava conflitos passou-se as partes iniciais que eram comuns às duas alternativas de cada não terminal para uma outra produção. Desta forma eliminou-se os conflitos.\\\\\\\\\\
 \section{Assembly da Máquina Virtual VM}
 Para gerar o compilador, foram tomadas algumas decisões a nível do \textit{Assembly}, tais como: 
 \begin{itemize}
@@ -165,30 +183,6 @@ De seguida coloca-se o valor a atribuir no topo da stack e executa-se a instruç
 \item Uma vez que a linguagem apenas suporta inteiros (excetuando o caso de imprimir cadeias de caracteres), a leitura do standard input é feita com a instrução "read" seguida da instrução "atoi". Para guardar o valor numa variável ou numa posição de um array ou de uma matriz, o procedimento é o mesmo das atribuições.
 \item O cálculo de uma qualquer operação consiste em colocar dois valores no topo da stack e executar a instrução pretendida (add, sub, mul, div, mod). A atribuição do valor resultante a uma variável é feita tal como explicado anteriormente.
 \item Calcular uma condição segue a mesma lógica do cálculo das operações, variando apenas nas instruções usadas (equal, equal not, infeq, supeq, inf, sup). É ainda possível calcular o valor lógico E usando a instrução "mul".
-\item Para permitir efetuar instruções de controlo de fluxo é necessário criar labels diferentes entre cada uma das instruções. Para isso criou-se um contador que incrementa sempre que se adicionar uma instrução condicional ou cíclica.
-No entanto com esta solução é possível distinguir as labels se apenas existirem instruções encadeadas, já que se existir alguma instrução de controlo de fluxo aninhada quando se imprimir a label que se encontra no final do bloco esta vai ter um valor diferente da que está no inicio do bloco.\\
-Para que seja possível incluir instruções aninhadas construiu-se uma stack (LIFO) que guarda as labels que ainda não foram concluídas. Assim, sempre que se imprimir a primeira label, inclui-se essa label na stack e incrementa-se o seu valor. Quando chegar à altura de imprimir a segunda label retira-se o seu valor da stack, pois a variável global pode ter sido alterada entrentanto.\\
-Desta forma, no caso de uma instrução condicional coloca-se a instrução "jz labelI1" imediatamente depois de testar a condição, sendo I1 a variável global que contem o número da label, e coloca-se I1 na stack, incrementando-a. 
-Se não existir bloco ELSE coloca-se a instrução "labelI1:" depois de executar o bloco, sendo I o valor que está na cabeça da stack, retirando-o.\\
-Caso haja um bloco ELSE inclui-se as instruções "jump labelI2" e "labelI1" a seguir ao bloco do IF e antes do bloco de instruções do ELSE, sendo I1 obtido da stack e I2 a variável global (como sempre esta variável é incrementada depois decolocada na stack). No final do bloco ELSE coloca-se a instrução "labelI2:" sendo I2 obtido da stack.
-\item Nas instruções ciclicas, coloca-se a instrução "labelI1:" antes de testar a condição, sendo o I1 o valor obtido da variável global (sendo colocada na stack e incrementada de seguida). Imediatamente depois de calcular a condição de paragem é colocada a instrução "jz labelI2" (mais uma vez é colocada na stack e incrementada). No final das instruções pertencentes ao bloco WHILE são adicionadas as instruções "jump labelI1" e "labelI2:", onde I1 e I2 são obtidos da stack.\\\\ 
-\textbf{NOTAS:}\\
-Nas produções relativas aos não terminais CondS e Array numa primeira abordagem colocou-se as seguintes produções:
-\begin{verbatim}
-CondS: IF '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); }
-	   '{' Instrs '}' { fprintf(f, "label%d:\n", pop()); }
-
-     | IF '(' Cond ')' { fprintf(f, "\tjz label%d\n", label); push(); }
-       '{' Instrs '}' ELSE { fprintf(f, "\tjump label%d\n", label);
-     			  		     fprintf(f, "label%d:\n", pop()); 
-   						     push(); } '{' Instrs '}' { fprintf(f, "label%d:\n", pop()); }
-
-Array: Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']'
-
-     | Var {fprintf(f, "\tpushgp\n\tpushi %d\n\tpadd\n", $1.pos);} '[' Atom ']'
-           { fprintf(f, "\tpushi %d\n\tmul\n", $1.tamL);} '[' Atom ']' {fprintf(f, "\tadd\n"); }
-\end{verbatim}
-Uma vez que esta abordagem gerava conflitos passou-se as partes iniciais que eram comuns às duas alternativas de cada não terminal para uma outra produção. Desta forma eliminou-se os conflitos.\\\\\\\\\\
 \end{itemize}
 \section{Exposição da GT}
 \begin{figure}[ht]
