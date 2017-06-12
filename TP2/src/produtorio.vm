@@ -1,0 +1,32 @@
+	pushi 0
+	pushi 0
+	pushi 0
+start
+	read
+	atoi
+	storeg 0
+	pushi 1
+	storeg 1
+label0:
+	pushg 0
+	pushi 0
+	sup
+	jz label1
+	read
+	atoi
+	storeg 2
+	pushg 1
+	pushg 2
+	mul
+	storeg 1
+	pushg 0
+	pushi 1
+	sub
+	storeg 0
+	jump label0
+label1:
+	pushs "Produtorio: "
+	writes
+	pushg 1
+	writei
+stop

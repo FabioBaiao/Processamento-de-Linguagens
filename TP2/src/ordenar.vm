@@ -1,0 +1,120 @@
+	pushn 5
+	pushi 0
+	pushi 0
+	pushi 0
+	pushi 0
+	pushi 0
+start
+	pushi 0
+	storeg 5
+label0:
+	pushg 5
+	pushi 5
+	inf
+	jz label1
+	read
+	atoi
+	storeg 6
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	pushg 6
+	storen
+	pushg 5
+	pushi 1
+	add
+	storeg 5
+	jump label0
+label1:
+	pushi 0
+	storeg 5
+label2:
+	pushg 5
+	pushi 5
+	inf
+	jz label3
+	pushg 5
+	pushi 1
+	add
+	storeg 8
+	pushg 5
+	storeg 9
+label4:
+	pushg 8
+	pushi 5
+	inf
+	jz label5
+	pushgp
+	pushi 0
+	padd
+	pushg 8
+	loadn
+	pushgp
+	pushi 0
+	padd
+	pushg 9
+	loadn
+	sup
+	jz label6
+	pushg 8
+	storeg 9
+label6:
+	pushg 8
+	pushi 1
+	add
+	storeg 8
+	jump label4
+label5:
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	loadn
+	storeg 7
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	pushgp
+	pushi 0
+	padd
+	pushg 9
+	loadn
+	storen
+	pushgp
+	pushi 0
+	padd
+	pushg 9
+	pushg 7
+	storen
+	pushg 5
+	pushi 1
+	add
+	storeg 5
+	jump label2
+label3:
+	pushi 0
+	storeg 5
+	pushs "Ordem descrescente\n"
+	writes
+label7:
+	pushg 5
+	pushi 5
+	inf
+	jz label8
+	pushgp
+	pushi 0
+	padd
+	pushg 5
+	loadn
+	writei
+	pushs " \n"
+	writes
+	pushg 5
+	pushi 1
+	add
+	storeg 5
+	jump label7
+label8:
+stop
